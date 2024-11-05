@@ -13,7 +13,4 @@
 # the License.
 
 
-"""Provide the application code layer."""
-
-from .knowledge_chat import KnowledgeChat
-from .dto import UserDTO
+"""Provide the domain code layer."""
