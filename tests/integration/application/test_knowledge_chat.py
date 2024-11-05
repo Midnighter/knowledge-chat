@@ -42,3 +42,25 @@ def test_create_get_user(user: UserDTO, application: KnowledgeChat):
     application.create_user(user=user)
     result = application.get_user(user_id=user.user_id)
     assert result == user
+
+
+@pytest.mark.parametrize(
+    "user",
+    [
+        UserDTO(
+            user_id="1234",
+            name="Richard Daniel Sanchez",
+            email="rick@multiverse.brain",
+        ),
+    ],
+)
+def test_start_conversation(user: UserDTO, application: KnowledgeChat):
+    """Test that a user can be created and retrieved."""
+    application.create_user(user=user)
+    conversation_id = "1234"
+    application.start_conversation(
+        user_id=user.user_id,
+        conversation_id=conversation_id,
+    )
+    notifications = application.notification_log.select(start=0, limit=10)
+    assert len(notifications) == 5
