@@ -16,4 +16,4 @@
 """Export indexes for domain models."""
 
 from .user_index import UserIndex
-from .chat_index import ChatIndex
+from .conversation_index import ConversationIndex

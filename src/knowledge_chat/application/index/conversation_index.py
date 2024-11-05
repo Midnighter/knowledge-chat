@@ -13,7 +13,7 @@
 # the License.
 
 
-"""Provide an index for chat domain models."""
+"""Provide an index for the conversation domain model."""
 
 from __future__ import annotations
 
@@ -22,41 +22,47 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from eventsourcing.domain import Aggregate
 
 
-class ChatIndex(Aggregate):
-    """Define a chat index."""
+class ConversationIndex(Aggregate):
+    """Define a conversation index."""
 
     class Created(Aggregate.Created):
         """Define the creation event."""
 
         user_id: str
-        chat_id: str
+        conversation_id: str
         reference: UUID
 
     def __init__(
         self,
         *,
         user_id: str,
-        chat_id: str,
+        conversation_id: str,
         reference: UUID,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.user_id = user_id
-        self.chat_id = chat_id
+        self.conversation_id = conversation_id
         self.reference = reference
 
     @classmethod
-    def create_id(cls, user_id: str, chat_id: str) -> UUID:
+    def create_id(cls, user_id: str, conversation_id: str) -> UUID:
         """Return a universally unique namespace identifier (UUID)."""
-        return uuid5(NAMESPACE_URL, f"/users/{user_id}/chats/{chat_id}")
+        return uuid5(NAMESPACE_URL, f"/users/{user_id}/conversations/{conversation_id}")
 
     @classmethod
-    def create(cls, *, user_id: str, chat_id: str, reference: UUID) -> ChatIndex:
-        """Create a chat index entry."""
+    def create(
+        cls,
+        *,
+        user_id: str,
+        conversation_id: str,
+        reference: UUID,
+    ) -> ConversationIndex:
+        """Create a conversation index entry."""
         return cls._create(
             event_class=cls.Created,
-            id=cls.create_id(user_id=user_id, chat_id=chat_id),
+            id=cls.create_id(user_id=user_id, conversation_id=conversation_id),
             user_id=user_id,
-            chat_id=chat_id,
+            conversation_id=conversation_id,
             reference=reference,
         )

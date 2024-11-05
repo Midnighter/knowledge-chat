@@ -13,23 +13,27 @@
 # the License.
 
 
-"""Test the chat index."""
+"""Test the conversation index."""
 
 from uuid import UUID, uuid4
 
-from knowledge_chat.application.index import ChatIndex
+from knowledge_chat.application.index import ConversationIndex
 
 
 def test_create_id():
-    """Test that the chat index creates a universally unique identifier (UUID)."""
-    assert isinstance(ChatIndex.create_id("1234", "5678"), UUID)
+    """Test that the conversation index creates a UUID."""
+    assert isinstance(ConversationIndex.create_id("1234", "5678"), UUID)
 
 
 def test_create():
-    """Test that a chat index entry is correctly created."""
+    """Test that a conversation index entry is correctly created."""
     user_id = "1234"
-    chat_id = "5678"
+    conversation_id = "5678"
     ref = uuid4()
-    index = ChatIndex.create(user_id=user_id, chat_id=chat_id, reference=ref)
-    assert index.id == ChatIndex.create_id(user_id, chat_id)
+    index = ConversationIndex.create(
+        user_id=user_id,
+        conversation_id=conversation_id,
+        reference=ref,
+    )
+    assert index.id == ConversationIndex.create_id(user_id, conversation_id)
     assert index.reference == ref
