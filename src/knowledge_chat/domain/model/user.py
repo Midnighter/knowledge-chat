@@ -15,6 +15,9 @@
 
 """Provide a user aggregate root domain model."""
 
+from collections.abc import Iterable
+from uuid import UUID
+
 from eventsourcing.domain import Aggregate, event
 
 
@@ -32,3 +35,14 @@ class User(Aggregate):
         super().__init__(**kwargs)
         self.name = name
         self.email = email
+        self._conversation_references = []
+
+    @event("ConversationAdded")
+    def add_conversation(self, conversation_reference: UUID) -> None:
+        """Add a reference to a conversation this user is having."""
+        self._conversation_references.append(conversation_reference)
+
+    @property
+    def conversation_references(self) -> Iterable[UUID]:
+        """Return iterable conversation references."""
+        return iter(self._conversation_references)

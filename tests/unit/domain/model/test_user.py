@@ -15,9 +15,17 @@
 
 """Test the user aggregate."""
 
-from uuid import UUID
+from uuid import UUID, uuid4
+
+import pytest
 
 from knowledge_chat.domain.model import User
+
+
+@pytest.fixture
+def user() -> User:
+    """Return a user aggregate instance."""
+    return User(name="Rick Daniel Sanchez", email="rick@multiverse.brain")
 
 
 def test_create():
@@ -28,9 +36,15 @@ def test_create():
     assert user.email == "rick@multiverse.brain"
 
 
-def test_reconstruct():
+def test_add_conversation(user: User):
+    """Test that a conversation reference can be added."""
+    conversation_ref = uuid4()
+    user.add_conversation(conversation_ref)
+    assert len(list(user.conversation_references)) == 1
+
+
+def test_reconstruct(user: User):
     """Test that a user's state is reconstructed from its events."""
-    user = User(name="Rick Daniel Sanchez", email="rick@multiverse.brain")
     events = user.collect_events()
     assert len(events) == 1
     assert isinstance(events[0], User.Created)
