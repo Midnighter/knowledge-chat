@@ -16,3 +16,4 @@
 """Export domain models."""
 
 from .user import User
+from .conversation import Conversation
