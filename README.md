@@ -1,0 +1,15 @@
+# Knowledge Chat
+
+| |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|---|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Package | [![Latest PyPI Version](https://img.shields.io/pypi/v/knowledge-chat.svg)](https://pypi.org/project/knowledge-chat/) [![Supported Python Versions](https://img.shields.io/pypi/pyversions/knowledge-chat.svg)](https://pypi.org/project/knowledge-chat/) [![Documentation](https://readthedocs.org/projects/knowledge-chat/badge/?version=latest)](https://knowledge-chat.readthedocs.io/en/latest/?badge=latest)                                                                                                                                                                              |
+| Meta | [![Apache-2.0](https://img.shields.io/pypi/l/knowledge-chat.svg)](LICENSE) [![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](.github/CODE_OF_CONDUCT.md) [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/) [![Code Style Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black) [![Linting: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) |
+| Automation |                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+
+_A framework to enable retrieval augmented generation (RAG) with knowledge graphs for chat applications._
+
+## Copyright
+
+- Copyright © 2024 Moritz E. Beber.
+- Free software distributed under the [Apache Software License 2.0](./LICENSE).
+
