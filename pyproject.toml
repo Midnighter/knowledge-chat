@@ -33,8 +33,18 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Typing :: Typed",
 ]
-# TODO: add keywords
-keywords = []
+keywords = [
+    "genai",
+    "genai-chatbot",
+    "rag",
+    "graph-rag",
+    "knowledge-graph",
+    "event-sourcing",
+    "llm",
+    "langchain",
+    "chainlit",
+    "neo4j",
+]
 # TODO: add dependencies
 dependencies = []
 
