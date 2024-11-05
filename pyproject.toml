@@ -47,12 +47,6 @@ Documentation = "https://knowledge-chat.readthedocs.io"
 "Bug Tracker" = "https://github.com/Midnighter/knowledge-chat/issues"
 Download = "https://pypi.org/project/knowledge-chat/#files"
 
-[project.optional-dependencies]
-dev = [
-    "hatch",
-    "pre-commit",
-]
-
 ################################################################################
 # Tool Configuration
 ################################################################################
@@ -155,6 +149,17 @@ exclude = "_version.py"
 ################################################################################
 # Hatch Environments
 ################################################################################
+
+[tool.hatch.envs.dev]
+description = """
+Development environment.
+
+A workaround for PyCharm, see https://youtrack.jetbrains.com/issue/PY-60410.
+"""
+extra-dependencies = [
+    "mdformat",
+]
+path = ".venv"
 
 [tool.hatch.envs.style]
 description = """Check the style of the codebase."""
