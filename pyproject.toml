@@ -45,8 +45,9 @@ keywords = [
     "chainlit",
     "neo4j",
 ]
-# TODO: add dependencies
-dependencies = []
+dependencies = [
+    "eventsourcing ~=9.3",
+]
 
 [project.urls]
 Homepage = "https://github.com/Midnighter/knowledge-chat"
@@ -165,7 +166,7 @@ Development environment.
 A workaround for PyCharm, see https://youtrack.jetbrains.com/issue/PY-60410.
 """
 extra-dependencies = [
-    "mdformat",
+    "pytest",
 ]
 path = ".venv"
 
