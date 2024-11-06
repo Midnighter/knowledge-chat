@@ -162,6 +162,19 @@ exclude = "_version.py"
 #init_typed = true
 #warn_required_dynamic_aliases = true
 
+[tool.importlinter]
+root_package = "knowledge_chat"
+
+[[tool.importlinter.contracts]]
+name = "Impose the domain-driven design (DDD) code layer hierarchy, that means infrastructure > application > domain."
+type = "layers"
+containers = "knowledge_chat"
+layers = [
+    "infrastructure",
+    "application",
+    "domain",
+]
+
 ################################################################################
 # Hatch Environments
 ################################################################################
@@ -190,6 +203,15 @@ docstrings = "pydoclint"
 code = "ruff check {args}"
 format = "ruff format {args}"
 check = ["docstrings", "code"]
+
+[tool.hatch.envs.imports]
+description = """Check the adherence to DDD code layers."""
+extra-dependencies = [
+    "import-linter",
+]
+
+[tool.hatch.envs.imports.scripts]
+check = "lint-imports"
 
 [tool.hatch.envs.audit]
 description = """Check dependencies for security vulnerabilities."""
