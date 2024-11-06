@@ -35,7 +35,7 @@ class User(Aggregate):
         super().__init__(**kwargs)
         self.name = name
         self.email = email
-        self._conversation_references = []
+        self._conversation_references: list[UUID] = []
 
     @event("ConversationAdded")
     def add_conversation(self, conversation_reference: UUID) -> None:
