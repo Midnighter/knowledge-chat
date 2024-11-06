@@ -15,7 +15,11 @@
 
 """Provide a user data transfer object (DTO)."""
 
+from __future__ import annotations
+
 from typing import NamedTuple
+
+from knowledge_chat.domain.model import User
 
 
 class UserDTO(NamedTuple):
@@ -24,3 +28,16 @@ class UserDTO(NamedTuple):
     user_id: str
     name: str
     email: str
+
+    @classmethod
+    def from_user(cls, user_id: str, user: User) -> UserDTO:
+        """Transform a user domain model into a DTO."""
+        return cls(
+            user_id=user_id,
+            name=user.name,
+            email=user.email,
+        )
+
+    def create(self) -> User:
+        """Create a new user instance."""
+        return User(name=self.name, email=self.email)
