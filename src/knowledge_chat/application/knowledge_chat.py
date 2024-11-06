@@ -17,9 +17,10 @@
 
 from eventsourcing.application import AggregateNotFoundError, Application
 
+from knowledge_chat.domain.error import ConversationNotFoundError, UserNotFoundError
 from knowledge_chat.domain.model import Conversation, User
 
-from .dto import UserDTO
+from .dto import ConversationDTO, UserDTO
 from .index import ConversationIndex, UserIndex
 
 
@@ -28,7 +29,7 @@ class KnowledgeChat(Application):
 
     def create_user(self, user: UserDTO) -> None:
         """Create a new user instance and persist it."""
-        domain_user = User(name=user.name, email=user.email)
+        domain_user = user.create()
         index = UserIndex.create(user_id=user.user_id, reference=domain_user.id)
         self.save(domain_user, index)
 
@@ -37,18 +38,14 @@ class KnowledgeChat(Application):
         try:
             index: UserIndex = self.repository.get(UserIndex.create_id(user_id=user_id))
         except AggregateNotFoundError as error:
-            msg = (
-                f"A user with external ID '{user_id}' does not exist yet. Please, "
-                f"create one first."
-            )
-            raise RuntimeError(msg) from error
+            raise UserNotFoundError(user_id=user_id) from error
         # We assume that when the index exists, so does the reference.
         return self.repository.get(index.reference)
 
     def get_user(self, user_id: str) -> UserDTO:
         """Get user data by their external identifier."""
         user = self._get_user(user_id)
-        return UserDTO(user_id=user_id, name=user.name, email=user.email)
+        return UserDTO.from_user(user_id=user_id, user=user)
 
     def start_conversation(self, user_id: str, conversation_id: str) -> None:
         """Add a new conversation to the user."""
@@ -61,3 +58,29 @@ class KnowledgeChat(Application):
         )
         user.add_conversation(conversation_reference=conversation.id)
         self.save(user, conversation, index)
+
+    def _get_conversation(self, user_id: str, conversation_id: str) -> Conversation:
+        """Get a conversation's state by its external identifiers."""
+        try:
+            index: ConversationIndex = self.repository.get(
+                ConversationIndex.create_id(
+                    user_id=user_id,
+                    conversation_id=conversation_id,
+                ),
+            )
+        except AggregateNotFoundError as error:
+            raise ConversationNotFoundError(
+                user_id=user_id,
+                conversation_id=conversation_id,
+            ) from error
+        # We assume that when the index exists, so does the reference.
+        return self.repository.get(index.reference)
+
+    def get_conversation(self, user_id: str, conversation_id: str) -> ConversationDTO:
+        """Get conversation data by its external identifiers."""
+        conversation = self._get_conversation(user_id, conversation_id)
+        return ConversationDTO.from_conversation(
+            user_id=user_id,
+            conversation_id=conversation_id,
+            conversation=conversation,
+        )

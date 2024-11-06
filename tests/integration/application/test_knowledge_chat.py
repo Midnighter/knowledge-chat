@@ -18,7 +18,7 @@
 import pytest
 
 from knowledge_chat.application import KnowledgeChat
-from knowledge_chat.application.dto import UserDTO
+from knowledge_chat.application.dto import ConversationDTO, UserDTO
 
 
 @pytest.fixture
@@ -54,7 +54,7 @@ def test_create_get_user(user: UserDTO, application: KnowledgeChat):
         ),
     ],
 )
-def test_start_conversation(user: UserDTO, application: KnowledgeChat):
+def test_start_get_conversation(user: UserDTO, application: KnowledgeChat):
     """Test that a user can be created and retrieved."""
     application.create_user(user=user)
     conversation_id = "1234"
@@ -64,3 +64,12 @@ def test_start_conversation(user: UserDTO, application: KnowledgeChat):
     )
     notifications = application.notification_log.select(start=0, limit=10)
     assert len(notifications) == 5
+
+    result = application.get_conversation(
+        user_id=user.user_id,
+        conversation_id=conversation_id,
+    )
+    assert result == ConversationDTO(
+        user_id=user.user_id,
+        conversation_id=conversation_id,
+    )
