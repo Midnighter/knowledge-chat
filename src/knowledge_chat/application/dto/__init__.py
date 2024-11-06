@@ -16,3 +16,4 @@
 """Export data transfer objects (DTOs)."""
 
 from .user_dto import UserDTO
+from .conversation_dto import ConversationDTO
