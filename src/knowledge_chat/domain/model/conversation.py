@@ -21,10 +21,10 @@ from eventsourcing.domain import Aggregate, event
 
 from knowledge_chat.domain.error import KnowledgeChatError
 
-from . import Thought
 from .exchange import Exchange
 from .query import Query
 from .response import Response
+from .thought import Thought
 
 
 class Conversation(Aggregate):
@@ -39,7 +39,7 @@ class Conversation(Aggregate):
     def __init__(self, *, user_reference: UUID, **kwargs) -> None:
         super().__init__(**kwargs)
         self._user_reference = user_reference
-        self._exchanges = []
+        self._exchanges: list[Exchange] = []
 
     @property
     def user_reference(self) -> UUID:
@@ -68,7 +68,7 @@ class Conversation(Aggregate):
         proceeding to the next exchange.
 
         """
-        if self._exchanges and not self.latest_exchange.is_closed:
+        if (latest := self.latest_exchange) is not None and not latest.is_closed:
             raise KnowledgeChatError(message="The latest exchange was never closed.")
 
         self._exchanges.append(Exchange(query=query))
@@ -86,7 +86,7 @@ class Conversation(Aggregate):
                 message="There is no exchange; raise a query first.",
             )
 
-        if self._exchanges and self.latest_exchange.is_closed:
+        if (latest := self.latest_exchange) is not None and latest.is_closed:
             raise KnowledgeChatError(message="The latest exchange is already closed.")
 
         self.latest_exchange.add_thought(thought)
@@ -104,7 +104,7 @@ class Conversation(Aggregate):
                 message="There is no exchange; raise a query first.",
             )
 
-        if self._exchanges and self.latest_exchange.is_closed:
+        if (latest := self.latest_exchange) is not None and latest.is_closed:
             raise KnowledgeChatError(message="The latest exchange is already closed.")
 
         self.latest_exchange.close(response)
