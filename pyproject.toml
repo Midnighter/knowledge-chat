@@ -47,6 +47,8 @@ keywords = [
 ]
 dependencies = [
     "eventsourcing ~=9.3",
+    "pydantic ~=2.9",
+    "pydantic-settings ~=2.6",
 ]
 
 [project.urls]
