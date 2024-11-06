@@ -20,9 +20,10 @@ from uuid import UUID
 from eventsourcing.application import AggregateNotFoundError, Application
 
 from knowledge_chat.domain.error import NotFoundError
-from knowledge_chat.domain.model import Conversation, User
+from knowledge_chat.domain.model import Conversation, Query, User
+from knowledge_chat.domain.service import DomainServiceRegistry
 
-from .dto import ConversationDTO, UserDTO
+from .dto import ConversationDTO, ExchangeOutputDTO, UserDTO
 
 
 class KnowledgeChat(Application):
@@ -69,3 +70,12 @@ class KnowledgeChat(Application):
         """Get conversation data by its identifier."""
         conversation = self._get_conversation(conversation_id)
         return ConversationDTO.from_conversation(conversation=conversation)
+
+    def respond_to(self, query: str, conversation_id: UUID) -> ExchangeOutputDTO:
+        """Use a configured agent to respond to the given query."""
+        conversation = self._get_conversation(conversation_id)
+        conversation.raise_query(Query(text=query))
+        agent = DomainServiceRegistry.get_response_agent({})
+        agent.respond_to(conversation)
+        self.save(conversation)
+        return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)
