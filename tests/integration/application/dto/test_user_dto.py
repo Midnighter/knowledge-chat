@@ -21,11 +21,7 @@ from knowledge_chat.domain.model import User
 
 def test_create():
     """Test that the user instance created by the DTO is valid."""
-    dto = UserDTO(
-        user_id="1234",
-        name="Rick Daniel Sanchez",
-        email="rick@multiverse.brain",
-    )
+    dto = UserDTO(name="Richard Daniel Sanchez", email="rick@multiverse.brain")
     user = dto.create()
     assert isinstance(user, User)
     assert user.name == dto.name
@@ -34,9 +30,8 @@ def test_create():
 
 def test_from_user():
     """Test that a DTO created from a user is valid."""
-    user = User(name="Rick Daniel Sanchez", email="rick@multiverse.brain")
-    dto = UserDTO.from_user(user_id="1234", user=user)
+    user = User(name="Richard Daniel Sanchez", email="rick@multiverse.brain")
+    dto = UserDTO.from_user(user=user)
     assert isinstance(dto, UserDTO)
-    assert dto.user_id == "1234"
     assert dto.name == user.name
     assert dto.email == user.email

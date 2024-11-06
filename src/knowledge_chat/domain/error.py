@@ -15,6 +15,8 @@
 
 """Provide knowledge-chat specific error classes."""
 
+from uuid import UUID
+
 
 class KnowledgeChatError(Exception):
     """Define the basic knowledge-chat error."""
@@ -28,32 +30,11 @@ class KnowledgeChatError(Exception):
         return self.message
 
 
-class UserNotFoundError(KnowledgeChatError):
-    """Define the error raised when a requested user is not found."""
+class NotFoundError(KnowledgeChatError):
+    """Define the error raised when a requested aggregate is not found."""
 
-    def __init__(self, *, user_id: str, message: str | None = None, **kwargs) -> None:
+    def __init__(self, *, uuid: UUID, message: str | None = None, **kwargs) -> None:
         if message is None:
-            message = f"The requested user '/users/{user_id}' does not exist."
+            message = f"The requested aggregate '{uuid!s}' does not exist."
         super().__init__(message=message, **kwargs)
-        self.user_id = user_id
-
-
-class ConversationNotFoundError(KnowledgeChatError):
-    """Define the error raised when a requested conversation is not found."""
-
-    def __init__(
-        self,
-        *,
-        user_id: str,
-        conversation_id: str,
-        message: str | None = None,
-        **kwargs,
-    ) -> None:
-        if message is None:
-            message = (
-                f"The requested conversation '/users/{user_id}/conversations/"
-                f"{conversation_id}' does not exist."
-            )
-        super().__init__(message=message, **kwargs)
-        self.user_id = user_id
-        self.conversation_id = conversation_id
+        self.uuid = uuid

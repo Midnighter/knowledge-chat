@@ -31,7 +31,6 @@ def application() -> KnowledgeChat:
     "user",
     [
         UserDTO(
-            user_id="1234",
             name="Richard Daniel Sanchez",
             email="rick@multiverse.brain",
         ),
@@ -39,8 +38,8 @@ def application() -> KnowledgeChat:
 )
 def test_create_get_user(user: UserDTO, application: KnowledgeChat):
     """Test that a user can be created and retrieved."""
-    application.create_user(user=user)
-    result = application.get_user(user_id=user.user_id)
+    user_id = application.create_user(user=user)
+    result = application.get_user(user_id=user_id)
     assert result == user
 
 
@@ -48,7 +47,6 @@ def test_create_get_user(user: UserDTO, application: KnowledgeChat):
     "user",
     [
         UserDTO(
-            user_id="1234",
             name="Richard Daniel Sanchez",
             email="rick@multiverse.brain",
         ),
@@ -56,20 +54,10 @@ def test_create_get_user(user: UserDTO, application: KnowledgeChat):
 )
 def test_start_get_conversation(user: UserDTO, application: KnowledgeChat):
     """Test that a user can be created and retrieved."""
-    application.create_user(user=user)
-    conversation_id = "1234"
-    application.start_conversation(
-        user_id=user.user_id,
-        conversation_id=conversation_id,
-    )
+    user_id = application.create_user(user=user)
+    conversation_id = application.start_conversation(user_id=user_id)
     notifications = application.notification_log.select(start=0, limit=10)
-    assert len(notifications) == 5
+    assert len(notifications) == 3
 
-    result = application.get_conversation(
-        user_id=user.user_id,
-        conversation_id=conversation_id,
-    )
-    assert result == ConversationDTO(
-        user_id=user.user_id,
-        conversation_id=conversation_id,
-    )
+    result = application.get_conversation(conversation_id=conversation_id)
+    assert result == ConversationDTO()

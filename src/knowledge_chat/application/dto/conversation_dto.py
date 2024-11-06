@@ -25,18 +25,10 @@ from knowledge_chat.domain.model import Conversation  # noqa: TCH001
 class ConversationDTO(NamedTuple):
     """Define the conversation data transfer object (DTO)."""
 
-    user_id: str
-    conversation_id: str
-
     @classmethod
     def from_conversation(
         cls,
-        user_id: str,
-        conversation_id: str,
         conversation: Conversation,  # noqa: ARG003
     ) -> ConversationDTO:
         """Transform a conversation domain model into a DTO."""
-        return cls(
-            user_id=user_id,
-            conversation_id=conversation_id,
-        )
+        return cls()

@@ -25,11 +25,5 @@ def test_from_conversation():
     """Test that a DTO created from a conversation is valid."""
     user_ref = uuid4()
     conversation = Conversation(user_reference=user_ref)
-    dto = ConversationDTO.from_conversation(
-        user_id="1234",
-        conversation_id="5678",
-        conversation=conversation,
-    )
+    dto = ConversationDTO.from_conversation(conversation=conversation)
     assert isinstance(dto, ConversationDTO)
-    assert dto.user_id == "1234"
-    assert dto.conversation_id == "5678"

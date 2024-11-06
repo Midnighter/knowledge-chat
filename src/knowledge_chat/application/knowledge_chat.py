@@ -15,72 +15,57 @@
 
 """Provide the knowledge chat application."""
 
+from uuid import UUID
+
 from eventsourcing.application import AggregateNotFoundError, Application
 
-from knowledge_chat.domain.error import ConversationNotFoundError, UserNotFoundError
+from knowledge_chat.domain.error import NotFoundError
 from knowledge_chat.domain.model import Conversation, User
 
 from .dto import ConversationDTO, UserDTO
-from .index import ConversationIndex, UserIndex
 
 
 class KnowledgeChat(Application):
     """Define the knowledge chat application."""
 
-    def create_user(self, user: UserDTO) -> None:
+    def create_user(self, user: UserDTO) -> UUID:
         """Create a new user instance and persist it."""
         domain_user = user.create()
-        index = UserIndex.create(user_id=user.user_id, reference=domain_user.id)
-        self.save(domain_user, index)
+        self.save(domain_user)
+        return domain_user.id
 
-    def _get_user(self, user_id: str) -> User:
-        """Get a user's state by their external identifier."""
+    def _get_user(self, user_id: UUID) -> User:
+        """Get a user's state by their identifier."""
         try:
-            index: UserIndex = self.repository.get(UserIndex.create_id(user_id=user_id))
+            result: User = self.repository.get(user_id)
         except AggregateNotFoundError as error:
-            raise UserNotFoundError(user_id=user_id) from error
-        # We assume that when the index exists, so does the reference.
-        return self.repository.get(index.reference)
+            raise NotFoundError(uuid=user_id) from error
 
-    def get_user(self, user_id: str) -> UserDTO:
-        """Get user data by their external identifier."""
+        return result
+
+    def get_user(self, user_id: UUID) -> UserDTO:
+        """Get user data by their identifier."""
         user = self._get_user(user_id)
-        return UserDTO.from_user(user_id=user_id, user=user)
+        return UserDTO.from_user(user=user)
 
-    def start_conversation(self, user_id: str, conversation_id: str) -> None:
+    def start_conversation(self, user_id: UUID) -> UUID:
         """Add a new conversation to the user."""
         user = self._get_user(user_id)
         conversation = Conversation(user_reference=user.id)
-        index = ConversationIndex.create(
-            user_id=user_id,
-            conversation_id=conversation_id,
-            reference=conversation.id,
-        )
         user.add_conversation(conversation_reference=conversation.id)
-        self.save(user, conversation, index)
+        self.save(user, conversation)
+        return conversation.id
 
-    def _get_conversation(self, user_id: str, conversation_id: str) -> Conversation:
-        """Get a conversation's state by its external identifiers."""
+    def _get_conversation(self, conversation_id: UUID) -> Conversation:
+        """Get a conversation's state by its identifier."""
         try:
-            index: ConversationIndex = self.repository.get(
-                ConversationIndex.create_id(
-                    user_id=user_id,
-                    conversation_id=conversation_id,
-                ),
-            )
+            result: Conversation = self.repository.get(conversation_id)
         except AggregateNotFoundError as error:
-            raise ConversationNotFoundError(
-                user_id=user_id,
-                conversation_id=conversation_id,
-            ) from error
-        # We assume that when the index exists, so does the reference.
-        return self.repository.get(index.reference)
+            raise NotFoundError(uuid=conversation_id) from error
 
-    def get_conversation(self, user_id: str, conversation_id: str) -> ConversationDTO:
-        """Get conversation data by its external identifiers."""
-        conversation = self._get_conversation(user_id, conversation_id)
-        return ConversationDTO.from_conversation(
-            user_id=user_id,
-            conversation_id=conversation_id,
-            conversation=conversation,
-        )
+        return result
+
+    def get_conversation(self, conversation_id: UUID) -> ConversationDTO:
+        """Get conversation data by its identifier."""
+        conversation = self._get_conversation(conversation_id)
+        return ConversationDTO.from_conversation(conversation=conversation)
