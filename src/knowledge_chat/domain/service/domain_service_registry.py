@@ -13,7 +13,17 @@
 # the License.
 
 
-"""Export domain services."""
+"""Provide an abstract interface for the domain service registry."""
+
+from abc import ABC, abstractmethod
+from typing import Any
 
 from .response_agent import ResponseAgent
-from .domain_service_registry import DomainServiceRegistry
+
+
+class DomainServiceRegistry(ABC):
+    """Define the abstract interface for the domain service registry."""
+
+    @abstractmethod
+    def get_response_agent(self, settings: Any) -> ResponseAgent:  # noqa: ANN401
+        """Return a fully configured response agent."""
