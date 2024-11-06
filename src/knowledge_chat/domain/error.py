@@ -19,20 +19,23 @@
 class KnowledgeChatError(Exception):
     """Define the basic knowledge-chat error."""
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, *, message: str, **kwargs) -> None:
         super().__init__(**kwargs)
+        self.message = message
+
+    def __str__(self) -> str:
+        """Return a string representation of the error."""
+        return self.message
 
 
 class UserNotFoundError(KnowledgeChatError):
     """Define the error raised when a requested user is not found."""
 
     def __init__(self, *, user_id: str, message: str | None = None, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.user_id = user_id
         if message is None:
-            self.message = f"The requested user '/users/{user_id}' does not exist."
-        else:
-            self.message = message
+            message = f"The requested user '/users/{user_id}' does not exist."
+        super().__init__(message=message, **kwargs)
+        self.user_id = user_id
 
 
 class ConversationNotFoundError(KnowledgeChatError):
@@ -46,13 +49,11 @@ class ConversationNotFoundError(KnowledgeChatError):
         message: str | None = None,
         **kwargs,
     ) -> None:
-        super().__init__(**kwargs)
-        self.user_id = user_id
-        self.conversation_id = conversation_id
         if message is None:
-            self.message = (
+            message = (
                 f"The requested conversation '/users/{user_id}/conversations/"
                 f"{conversation_id}' does not exist."
             )
-        else:
-            self.message = message
+        super().__init__(message=message, **kwargs)
+        self.user_id = user_id
+        self.conversation_id = conversation_id
