@@ -13,11 +13,16 @@
 # the License.
 
 
-"""Export domain models."""
+"""Provide a value object for a user's query."""
 
-from .user import User
-from .conversation import Conversation
-from .query import Query
-from .thought import Thought
-from .response import Response
-from .exchange import Exchange
+from typing import NamedTuple
+
+
+class Query(NamedTuple):
+    """Define a user's query, the beginning of an exchange."""
+
+    text: str
+
+    def __str__(self) -> str:
+        """Return a string representation of the query."""
+        return self.text

@@ -13,11 +13,15 @@
 # the License.
 
 
-"""Export domain models."""
+"""Provide a value object for an agent's thought."""
 
-from .user import User
-from .conversation import Conversation
-from .query import Query
-from .thought import Thought
-from .response import Response
-from .exchange import Exchange
+from __future__ import annotations
+
+from typing import Any, NamedTuple
+
+
+class Thought(NamedTuple):
+    """Define an agent's thought, an intermediate step in an exchange."""
+
+    content: Any
+    parent: Thought | None = None

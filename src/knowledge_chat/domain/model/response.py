@@ -13,11 +13,16 @@
 # the License.
 
 
-"""Export domain models."""
+"""Provide a value object for an agent's response."""
 
-from .user import User
-from .conversation import Conversation
-from .query import Query
-from .thought import Thought
-from .response import Response
-from .exchange import Exchange
+from typing import NamedTuple
+
+
+class Response(NamedTuple):
+    """Define an agent's response, the end of an exchange."""
+
+    text: str
+
+    def __str__(self) -> str:
+        """Return a string representation of the response."""
+        return self.text
