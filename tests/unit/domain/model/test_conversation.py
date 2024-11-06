@@ -17,7 +17,10 @@
 
 from uuid import UUID, uuid4
 
-from knowledge_chat.domain.model import Conversation
+import pytest
+
+from knowledge_chat.domain.error import KnowledgeChatError
+from knowledge_chat.domain.model import Conversation, Query, Response, Thought
 
 
 def test_create():
@@ -39,3 +42,96 @@ def test_reconstruct():
     copy = events[0].mutate(None)
     assert copy.id == conversation.id
     assert copy.user_reference == conversation.user_reference
+
+
+def test_no_latest_exchange():
+    """Test that there is no exchange without adding one."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+
+    assert conversation.latest_exchange is None
+
+
+def test_raise_query():
+    """Test that a new query can be raised on a fresh conversation."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+    conversation.raise_query(Query(text="Me first?"))
+
+    assert isinstance(conversation.collect_events()[-1], Conversation.QueryRaised)
+    assert conversation.latest_exchange is not None
+
+
+def test_cannot_query_twice():
+    """Test that a new query cannot be raised on an open exchange."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+    conversation.raise_query(Query(text="Me first?"))
+
+    with pytest.raises(KnowledgeChatError):
+        conversation.raise_query(Query(text="Who is second?"))
+
+
+def test_add_thought():
+    """Test that a new thought can be added to an open exchange."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+    conversation.raise_query(Query(text="Me first?"))
+    conversation.add_thought(Thought(content="Where am I?"))
+
+    assert isinstance(conversation.collect_events()[-1], Conversation.ThoughtAdded)
+    assert conversation.latest_exchange.get_last_thought().content == "Where am I?"
+
+
+def test_cannot_add_thought_without_exchange():
+    """Test that a new thought cannot be added without an exchange."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+
+    with pytest.raises(KnowledgeChatError):
+        conversation.add_thought(Thought(content="Where am I?"))
+
+
+def test_respond():
+    """Test that an open exchange can be responded to."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+    conversation.raise_query(Query(text="Me first?"))
+    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.respond(Response("Because!"))
+
+    assert isinstance(conversation.collect_events()[-1], Conversation.QueryRespondedTo)
+    assert conversation.latest_exchange.is_closed
+
+
+def test_cannot_respond_without_exchange():
+    """Test that a response cannot be added without an exchange."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+
+    with pytest.raises(KnowledgeChatError):
+        conversation.respond(Response("Doh!"))
+
+
+def test_cannot_add_thought_on_closed():
+    """Test that a new thought cannot be added to a closed exchange."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+    conversation.raise_query(Query(text="Me first?"))
+    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.respond(Response("Because!"))
+
+    with pytest.raises(KnowledgeChatError):
+        conversation.add_thought(Thought(content="Where am I?"))
+
+
+def test_cannot_respond_twice():
+    """Test that a closed exchange cannot be responded to."""
+    user_ref = uuid4()
+    conversation = Conversation(user_reference=user_ref)
+    conversation.raise_query(Query(text="Me first?"))
+    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.respond(Response("Because!"))
+
+    with pytest.raises(KnowledgeChatError):
+        conversation.respond(Response("Really?!"))

@@ -15,9 +15,9 @@
 
 """Export domain models."""
 
-from .user import User
-from .conversation import Conversation
 from .query import Query
 from .thought import Thought
 from .response import Response
 from .exchange import Exchange
+from .conversation import Conversation
+from .user import User
