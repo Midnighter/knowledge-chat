@@ -38,13 +38,20 @@ def test_add_thought():
     exchange.add_thought(Thought(content="cogito, ergo sum"))
 
 
+def test_no_latest_thought():
+    """Test that there is no thought without adding one."""
+    exchange = Exchange(query=Query(text="What gives?"))
+
+    assert exchange.lastest_thought is None
+
+
 def test_thought_lineage():
     """Test that a thought has a parent set."""
     exchange = Exchange(query=Query(text="What gives?"))
     exchange.add_thought(Thought(content="first"))
     exchange.add_thought(Thought(content="second"))
 
-    assert exchange.get_last_thought().parent.content == "first"
+    assert exchange.lastest_thought.parent.content == "first"
 
 
 def test_close():
@@ -54,6 +61,13 @@ def test_close():
     exchange.close(Response(text="Therefore."))
 
     assert exchange.is_closed
+
+
+def test_close_without_thought():
+    """Test that closing an exchange without thoughts emits a warning."""
+    exchange = Exchange(query=Query(text="What gives?"))
+    with pytest.warns(UserWarning):
+        exchange.close(Response(text="Accept it."))
 
 
 def test_cannot_add_thought():

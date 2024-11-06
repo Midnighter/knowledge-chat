@@ -80,7 +80,7 @@ def test_add_thought():
     conversation.add_thought(Thought(content="Where am I?"))
 
     assert isinstance(conversation.collect_events()[-1], Conversation.ThoughtAdded)
-    assert conversation.latest_exchange.get_last_thought().content == "Where am I?"
+    assert conversation.latest_exchange.lastest_thought.content == "Where am I?"
 
 
 def test_cannot_add_thought_without_exchange():

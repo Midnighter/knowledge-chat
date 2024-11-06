@@ -15,6 +15,7 @@
 
 """Provide an aggregate model for an exchange."""
 
+import warnings
 from collections.abc import Iterable
 
 from knowledge_chat.domain.error import KnowledgeChatError
@@ -55,12 +56,12 @@ class Exchange:
         """Whether the exchange is closed, that means, it has a response."""
         return self.response is not None
 
-    def get_last_thought(self) -> Thought:
+    @property
+    def lastest_thought(self) -> Thought | None:
         """Return the last thought."""
         if not self._thoughts:
-            raise KnowledgeChatError(
-                message="There are no thoughts part of this exchange.",
-            )
+            return None
+
         return self._thoughts[-1]
 
     def add_thought(self, thought: Thought) -> None:
@@ -79,7 +80,10 @@ class Exchange:
             raise KnowledgeChatError(message="This exchange is already closed.")
 
         if not self._thoughts:
-            msg = "No thoughts preceded this response."
-            raise UserWarning(msg)
+            warnings.warn(
+                message="No thoughts preceded this response.",
+                category=UserWarning,
+                stacklevel=2,
+            )
 
         self.response = response
