@@ -18,9 +18,8 @@
 from __future__ import annotations
 
 from typing import NamedTuple
-from uuid import UUID  # noqa: TCH003
 
-from knowledge_chat.domain.model import Conversation
+from knowledge_chat.domain.model import Conversation  # noqa: TCH001
 
 
 class ConversationDTO(NamedTuple):
@@ -28,22 +27,16 @@ class ConversationDTO(NamedTuple):
 
     user_id: str
     conversation_id: str
-    user_reference: UUID
 
     @classmethod
     def from_conversation(
         cls,
         user_id: str,
         conversation_id: str,
-        conversation: Conversation,
+        conversation: Conversation,  # noqa: ARG003
     ) -> ConversationDTO:
         """Transform a conversation domain model into a DTO."""
         return cls(
             user_id=user_id,
             conversation_id=conversation_id,
-            user_reference=conversation.user_reference,
         )
-
-    def create(self) -> Conversation:
-        """Create a new conversation instance."""
-        return Conversation(user_reference=self.user_reference)

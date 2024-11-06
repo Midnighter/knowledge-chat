@@ -21,19 +21,6 @@ from knowledge_chat.application.dto import ConversationDTO
 from knowledge_chat.domain.model import Conversation
 
 
-def test_create():
-    """Test that the conversation instance created by the DTO is valid."""
-    user_ref = uuid4()
-    dto = ConversationDTO(
-        user_id="1234",
-        conversation_id="5678",
-        user_reference=user_ref,
-    )
-    conversation = dto.create()
-    assert isinstance(conversation, Conversation)
-    assert conversation.user_reference == dto.user_reference
-
-
 def test_from_conversation():
     """Test that a DTO created from a conversation is valid."""
     user_ref = uuid4()
@@ -46,4 +33,3 @@ def test_from_conversation():
     assert isinstance(dto, ConversationDTO)
     assert dto.user_id == "1234"
     assert dto.conversation_id == "5678"
-    assert dto.user_reference == conversation.user_reference
