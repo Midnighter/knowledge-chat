@@ -23,5 +23,6 @@ from typing import Any, NamedTuple
 class Thought(NamedTuple):
     """Define an agent's thought, an intermediate step in an exchange."""
 
-    content: Any
+    subquery: str
+    context: Any
     parent: Thought | None = None

@@ -70,7 +70,11 @@ class Exchange:
             raise KnowledgeChatError(message="This exchange is already closed.")
 
         if self._thoughts:
-            thought = Thought(content=thought.content, parent=self._thoughts[-1])
+            thought = Thought(
+                subquery=thought.subquery,
+                context=thought.context,
+                parent=self._thoughts[-1],
+            )
 
         self._thoughts.append(thought)
 

@@ -24,7 +24,11 @@ from knowledge_chat.application.dto import ConversationDTO, UserDTO
 @pytest.fixture
 def application() -> KnowledgeChat:
     """Return an application instance per test unit."""
-    return KnowledgeChat()
+    return KnowledgeChat(
+        domain_service_registry=None,
+        knowledge_graph=None,
+        chat_model=None,
+    )
 
 
 @pytest.mark.parametrize(

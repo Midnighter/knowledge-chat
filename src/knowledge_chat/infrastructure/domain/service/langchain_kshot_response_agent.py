@@ -15,6 +15,8 @@
 
 """Provide a concrete chat agent implementation using langchain."""
 
+from typing import Any
+
 import structlog
 
 from knowledge_chat.domain.model import Conversation, Response, Thought
@@ -47,6 +49,12 @@ class LangchainKShotResponseAgent(ResponseAgent):
         )
         logger.debug("LANGCHAIN_RESULT_GENERATED", result=result)
         assert len(result["intermediate_steps"]) == 2  # noqa: PLR2004, S101
+        query: str | None = None
+        context: Any | None = None
         for obj in result["intermediate_steps"]:
-            conversation.add_thought(Thought(content=obj))
+            if "query" in obj:
+                query = obj["query"]
+            if "context" in obj:
+                context = obj["context"]
+        conversation.add_thought(Thought(subquery=query, context=context))
         conversation.respond(Response(text=result["result"]))

@@ -77,10 +77,12 @@ def test_add_thought():
     user_ref = uuid4()
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
-    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
 
     assert isinstance(conversation.collect_events()[-1], Conversation.ThoughtAdded)
-    assert conversation.latest_exchange.lastest_thought.content == "Where am I?"
+    # TODO (Moritz): Train wreck?  # noqa: FIX002, TD003
+    assert conversation.latest_exchange.lastest_thought.subquery == "Where am I?"
+    assert conversation.latest_exchange.lastest_thought.context == "You are here."
 
 
 def test_cannot_add_thought_without_exchange():
@@ -89,7 +91,9 @@ def test_cannot_add_thought_without_exchange():
     conversation = Conversation(user_reference=user_ref)
 
     with pytest.raises(KnowledgeChatError):
-        conversation.add_thought(Thought(content="Where am I?"))
+        conversation.add_thought(
+            Thought(subquery="Where am I?", context="You are here."),
+        )
 
 
 def test_respond():
@@ -97,7 +101,7 @@ def test_respond():
     user_ref = uuid4()
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
-    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
     conversation.respond(Response("Because!"))
 
     assert isinstance(conversation.collect_events()[-1], Conversation.QueryRespondedTo)
@@ -118,11 +122,13 @@ def test_cannot_add_thought_on_closed():
     user_ref = uuid4()
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
-    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
     conversation.respond(Response("Because!"))
 
     with pytest.raises(KnowledgeChatError):
-        conversation.add_thought(Thought(content="Where am I?"))
+        conversation.add_thought(
+            Thought(subquery="Where am I?", context="You are here."),
+        )
 
 
 def test_cannot_respond_twice():
@@ -130,7 +136,7 @@ def test_cannot_respond_twice():
     user_ref = uuid4()
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
-    conversation.add_thought(Thought(content="Where am I?"))
+    conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
     conversation.respond(Response("Because!"))
 
     with pytest.raises(KnowledgeChatError):

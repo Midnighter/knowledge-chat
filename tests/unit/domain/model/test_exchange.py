@@ -35,7 +35,7 @@ def test_init():
 def test_add_thought():
     """Test that a thought can be added to an open exchange."""
     exchange = Exchange(query=Query(text="What gives?"))
-    exchange.add_thought(Thought(content="cogito, ergo sum"))
+    exchange.add_thought(Thought(subquery="provocation", context="cogito, ergo sum"))
 
 
 def test_no_latest_thought():
@@ -48,16 +48,17 @@ def test_no_latest_thought():
 def test_thought_lineage():
     """Test that a thought has a parent set."""
     exchange = Exchange(query=Query(text="What gives?"))
-    exchange.add_thought(Thought(content="first"))
-    exchange.add_thought(Thought(content="second"))
+    exchange.add_thought(Thought(subquery="provocation", context="first"))
+    exchange.add_thought(Thought(subquery="provocation", context="second"))
 
-    assert exchange.lastest_thought.parent.content == "first"
+    # TODO (Moritz): Train wreck?  # noqa: FIX002, TD003
+    assert exchange.lastest_thought.parent.context == "first"
 
 
 def test_close():
     """Test that a response closes an exchange."""
     exchange = Exchange(query=Query(text="What gives?"))
-    exchange.add_thought(Thought(content="first"))
+    exchange.add_thought(Thought(subquery="provocation", context="first"))
     exchange.close(Response(text="Therefore."))
 
     assert exchange.is_closed
@@ -73,17 +74,17 @@ def test_close_without_thought():
 def test_cannot_add_thought():
     """Test that a thought cannot be added to a closed exchange."""
     exchange = Exchange(query=Query(text="What gives?"))
-    exchange.add_thought(Thought(content="first"))
+    exchange.add_thought(Thought(subquery="provocation", context="first"))
     exchange.close(Response(text="Therefore."))
 
     with pytest.raises(KnowledgeChatError):
-        exchange.add_thought(Thought(content="second"))
+        exchange.add_thought(Thought(subquery="provocation", context="second"))
 
 
 def test_cannot_respond_twice():
     """Test that a closed exchange cannot be responded to."""
     exchange = Exchange(query=Query(text="What gives?"))
-    exchange.add_thought(Thought(content="first"))
+    exchange.add_thought(Thought(subquery="provocation", context="first"))
     exchange.close(Response(text="Therefore."))
 
     with pytest.raises(KnowledgeChatError):
