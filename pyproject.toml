@@ -53,6 +53,12 @@ dependencies = [
     "neo4j ~=5.26",
     "pydantic ~=2.9",
     "pydantic-settings ~=2.6",
+    "structlog ~=24.4",
+]
+
+[project.optional-dependencies]
+local = [
+    "lanchain_ollama ~=0.2",
 ]
 
 [project.urls]
@@ -188,6 +194,7 @@ see https://youtrack.jetbrains.com/issue/PY-60410.
 extra-dependencies = [
     "pytest",
 ]
+features = ["local"]
 path = ".venv"
 
 [tool.hatch.envs.style]
