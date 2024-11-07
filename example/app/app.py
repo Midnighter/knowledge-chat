@@ -39,18 +39,23 @@ chat_app = KnowledgeChat(
 def init() -> None:
     """Initialize the user and chat."""
     logger.debug("CHAINLIT_ON_CHAT_STARTED")
+    logger.debug("USER_SESSION_ID_INSPECTED", user_session_id=cl.user_session.get("id"))
 
     try:
         user_id = UUID(cl.user_session.get("user-id", None))
+        logger.debug("EXISTING_USER_RESTORED", user_id=user_id)
     except TypeError:
         user_id = chat_app.create_user(UserDTO(name="anon", email="anon@me"))
         cl.user_session.set("user-id", str(user_id))
+        logger.debug("NEW_USER_CREATED", user_id=user_id)
 
     try:
         conversation_id = UUID(cl.user_session.get("conversation-id"))
+        logger.debug("EXISTING_CONVERSATION_RESTORED", conversation_id=conversation_id)
     except TypeError:
         conversation_id = chat_app.start_conversation(user_id)
         cl.user_session.set("conversation-id", str(conversation_id))
+        logger.debug("NEW_CONVERSATION_STARTED", conversation_id=conversation_id)
 
     logger.debug("CHAINLIT_ON_CHAT_ENDED")
 
@@ -58,7 +63,10 @@ def init() -> None:
 @cl.on_message
 async def chat(message: cl.Message) -> None:
     """Chat with the user-specific agent."""
+    logger.debug("USER_SESSION_ID_INSPECTED", user_session_id=cl.user_session.get("id"))
+
     conversation_id = UUID(cl.user_session.get("conversation-id"))
+    logger.debug("EXISTING_CONVERSATION_RESTORED", conversation_id=conversation_id)
 
     async_respond_to = cl.make_async(chat_app.respond_to)
     exchange = await async_respond_to(
