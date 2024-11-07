@@ -55,10 +55,10 @@ services:
     volumes:
       - "./ollama:/root/.ollama"
     # Uncomment the following section if you have an NVIDIA GPU configured with Docker.
-#    deploy:
-#      resources:
-#        reservations:
-#          devices:
-#            - driver: nvidia
-#              count: all
-#              capabilities: [ gpu ]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
