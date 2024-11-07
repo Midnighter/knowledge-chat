@@ -18,6 +18,7 @@
 from abc import ABC, abstractmethod
 
 from langchain.chains.base import Chain
+from langchain_core.tracers.base import BaseTracer
 
 from knowledge_chat.domain.model import Conversation
 
@@ -30,5 +31,10 @@ class ResponseAgent(ABC):
         self._chain = chain
 
     @abstractmethod
-    def respond_to(self, conversation: Conversation, **kwargs) -> None:
+    def respond_to(
+        self,
+        conversation: Conversation,
+        callbacks: list[BaseTracer] | None = None,
+        **kwargs,
+    ) -> None:
         """Respond to the latest query in the conversation."""

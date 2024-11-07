@@ -21,6 +21,7 @@ from eventsourcing.application import AggregateNotFoundError, Application
 from eventsourcing.utils import EnvType
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.tracers.base import BaseTracer
 
 from knowledge_chat.domain.error import NotFoundError
 from knowledge_chat.domain.model import Conversation, Query, User
@@ -88,16 +89,25 @@ class KnowledgeChat(Application):
         conversation = self._get_conversation(conversation_id)
         return ConversationDTO.from_conversation(conversation=conversation)
 
-    def respond_to(self, query: str, conversation_id: UUID) -> ExchangeOutputDTO:
+    def respond_to(
+        self,
+        query: str,
+        conversation_id: UUID,
+        callbacks: list[BaseTracer] | None = None,
+    ) -> ExchangeOutputDTO:
         """Use a configured agent to respond to the given query."""
         conversation = self._get_conversation(conversation_id)
+
         conversation.raise_query(Query(text=query))
+
         agent = self.domain_service_registry.get_response_agent(
             "knowledge_chat.infrastructure.domain.service."
             "langchain_kshot_response_agent:LangchainKShotResponseAgent",
             self.knowledge_graph,
             self.chat_model,
         )
-        agent.respond_to(conversation)
+
+        agent.respond_to(conversation, callbacks=callbacks)
+
         self.save(conversation)
         return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)

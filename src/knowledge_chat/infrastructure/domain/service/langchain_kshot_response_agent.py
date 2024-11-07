@@ -18,6 +18,7 @@
 from typing import Any
 
 import structlog
+from langchain_core.tracers.base import BaseTracer
 
 from knowledge_chat.domain.model import Conversation, Response, Thought
 from knowledge_chat.domain.service import ResponseAgent
@@ -38,7 +39,7 @@ class LangchainKShotResponseAgent(ResponseAgent):
     def respond_to(
         self,
         conversation: Conversation,
-        callbacks: list | None = None,
+        callbacks: list[BaseTracer] | None = None,
         **_,
     ) -> None:
         """Ask a question to the agent and return a response."""
