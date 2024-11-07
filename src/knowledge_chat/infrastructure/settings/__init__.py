@@ -16,4 +16,5 @@
 """Provide objects for loading and validating settings."""
 
 from .azure_openai_settings import AzureOpenAISettings
+from .ollama_settings import OllamaSettings
 from .neo4j_settings import Neo4jSettings
