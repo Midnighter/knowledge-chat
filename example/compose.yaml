@@ -1,0 +1,47 @@
+services:
+  chat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["chainlit", "run", "-w", "--host", "0.0.0.0", "app.py"]
+    environment:
+      - "PERSISTENCE_MODULE=${PERSISTENCE_MODULE:-eventsourcing.sqlite}"
+      - "SQLITE_DBNAME=/opt/data/event_store.sqlite"
+      - "NEO4J_USERNAME=${NEO4J_USERNAME:-neo4j}"
+      - "NEO4J_PASSWORD=${NEO4J_PASSWORD:-supersecret}"
+      - "NEO4J_CONNECTION_URI=bolt://knowledge-graph:7687"
+      - "OLLAMA_URL=http://ollama:11434"
+    image: movies-chat
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./app:/opt/chat"
+      - "./data:/opt/data"
+
+  knowledge-graph:
+    image: neo4j:5-community
+    environment:
+      - "NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-supersecret}"
+      - "NEO4J_PLUGINS=[\"apoc\"]"
+      - "NEO4J_dbms_security_procedures_unrestricted=apoc.*"
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - "./graph:/data"
+      - "./scripts:/opt/scripts"
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - "./ollama:/root/.ollama"
+    # Uncomment the following section if you have an NVIDIA GPU configured with Docker.
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: all
+#              capabilities: [ gpu ]
