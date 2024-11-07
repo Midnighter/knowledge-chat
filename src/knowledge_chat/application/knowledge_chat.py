@@ -18,6 +18,9 @@
 from uuid import UUID
 
 from eventsourcing.application import AggregateNotFoundError, Application
+from eventsourcing.utils import EnvType
+from langchain_community.graphs import Neo4jGraph
+from langchain_core.language_models.chat_models import BaseChatModel
 
 from knowledge_chat.domain.error import NotFoundError
 from knowledge_chat.domain.model import Conversation, Query, User
@@ -28,6 +31,20 @@ from .dto import ConversationDTO, ExchangeOutputDTO, UserDTO
 
 class KnowledgeChat(Application):
     """Define the knowledge chat application."""
+
+    def __init__(
+        self,
+        *,
+        domain_service_registry: DomainServiceRegistry,
+        knowledge_graph: Neo4jGraph,
+        chat_model: BaseChatModel,
+        env: EnvType | None = None,
+        **kwargs,
+    ) -> None:
+        super().__init__(env=env, **kwargs)
+        self.domain_service_registry = domain_service_registry
+        self.knowledge_graph = knowledge_graph
+        self.chat_model = chat_model
 
     def create_user(self, user: UserDTO) -> UUID:
         """Create a new user instance and persist it."""
@@ -75,7 +92,12 @@ class KnowledgeChat(Application):
         """Use a configured agent to respond to the given query."""
         conversation = self._get_conversation(conversation_id)
         conversation.raise_query(Query(text=query))
-        agent = DomainServiceRegistry.get_response_agent({})
+        agent = self.domain_service_registry.get_response_agent(
+            "knowledge_chat.infrastructure.domain.service."
+            "langchain_kshot_response_agent:LangchainKShotResponseAgent",
+            self.knowledge_graph,
+            self.chat_model,
+        )
         agent.respond_to(conversation)
         self.save(conversation)
         return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)
