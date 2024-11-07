@@ -14,17 +14,19 @@ setup: movies model app
 .PHONY: movies
 movies:
 	docker compose up -d knowledge-graph
-	sleep 5
+	./wait-for-it.sh localhost:7474 --strict -- wget --spider --no-verbose localhost:7474/
 	docker compose exec knowledge-graph cypher-shell \
 		-u neo4j \
 		-p supersecret \
 		-f /opt/scripts/movies.cypher
+	docker compose stop knowledge-graph
 
 .PHONY: model
 model:
 	docker compose up -d ollama
-	sleep 5
+	./wait-for-it.sh localhost:11434 --strict -- wget --spider --no-verbose localhost:11434/
 	docker compose exec ollama ollama pull 'llama3.2'
+	docker compose stop ollama
 
 .PHONY: app
 app:
