@@ -3,7 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["chainlit", "run", "-w", "--host", "0.0.0.0", "app.py"]
+    command: [ "chainlit", "run", "-w", "--host", "0.0.0.0", "app.py" ]
+    depends_on:
+      knowledge-graph:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
     environment:
       - "PERSISTENCE_MODULE=${PERSISTENCE_MODULE:-eventsourcing.sqlite}"
       - "SQLITE_DBNAME=/opt/data/event_store.sqlite"
@@ -19,11 +24,17 @@ services:
       - "./data:/opt/data"
 
   knowledge-graph:
-    image: neo4j:5-community
     environment:
       - "NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-supersecret}"
       - "NEO4J_PLUGINS=[\"apoc\"]"
       - "NEO4J_dbms_security_procedures_unrestricted=apoc.*"
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "--no-verbose", "localhost:7474/" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    image: neo4j:5-community
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -32,6 +43,12 @@ services:
       - "./scripts:/opt/scripts"
 
   ollama:
+    healthcheck:
+      test: [ "CMD", "ollama", "ps" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     image: ollama/ollama:latest
     ports:
       - "11434:11434"
