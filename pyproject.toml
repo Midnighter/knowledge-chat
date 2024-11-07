@@ -58,7 +58,7 @@ dependencies = [
 
 [project.optional-dependencies]
 local = [
-    "lanchain_ollama ~=0.2",
+    "langchain_ollama ~=0.2",
 ]
 
 [project.urls]
@@ -184,6 +184,11 @@ layers = [
 # Hatch Environments
 ################################################################################
 
+[tool.hatch.env]
+requires = [
+    "hatch-pip-compile"
+]
+
 [tool.hatch.envs.dev]
 description = """
 Development environment.
@@ -280,3 +285,17 @@ python = ["3.12", "3.13"]
 
 [tool.hatch.envs.test.scripts]
 run = "pytest {args:--cov=knowledge_chat --cov-report=term-missing}"
+
+[tool.hatch.envs.example]
+type = "pip-compile"
+lock-filename = "{root}/example/requirements.txt"
+pip-compile-hashes = true
+pip-compile-resolver = "uv"
+pip-compile-verbose = true
+extra-dependencies = [
+    "chainlit ~=1.3",
+]
+features = ["local"]
+
+[tool.hatch.envs.example.scripts]
+deploy = "hatch build --target wheel --clean {root}/example/dist"
