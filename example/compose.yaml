@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "chainlit", "run", "-w", "--host", "0.0.0.0", "app.py" ]
+    command: [ "chainlit", "run", "--headless", "--watch", "--host", "0.0.0.0", "app.py" ]
     depends_on:
       knowledge-graph:
         condition: service_healthy
