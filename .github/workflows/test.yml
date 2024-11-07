@@ -30,6 +30,9 @@ jobs:
       - name: Check docstrings
         run: hatch run style:docstrings
 
+      - name: Lint imports
+        run: hatch run imports:check
+
       - name: Build documentation
         run: hatch run docs:build
 
