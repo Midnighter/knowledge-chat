@@ -137,6 +137,9 @@ exclude = [
     "ANN201",  # 'Missing type annotation for {return}' ignored because all tests return `None`.
     "PLR2004",  # 'Magic value used in comparison' ignored, as it is a common pattern in tests.
 ]
+"example/**/*.py" = [
+    "INP001",  # 'implicit namespace package' ignored.
+]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
