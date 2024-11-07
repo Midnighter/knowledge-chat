@@ -24,4 +24,4 @@ COPY ./app .
 
 EXPOSE 8000
 
-CMD ["chainlit", "run", "--host", "0.0.0.0", "app.py"]
+CMD ["chainlit", "run", "--headless", "--host", "0.0.0.0", "app.py"]
