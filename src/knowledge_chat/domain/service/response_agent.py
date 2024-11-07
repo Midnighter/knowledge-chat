@@ -17,12 +17,18 @@
 
 from abc import ABC, abstractmethod
 
+from langchain.chains.base import Chain
+
 from knowledge_chat.domain.model import Conversation
 
 
 class ResponseAgent(ABC):
     """Define the abstract interface for the response agent."""
 
+    def __init__(self, *, chain: Chain, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self._chain = chain
+
     @abstractmethod
-    def respond_to(self, conversation: Conversation) -> None:
+    def respond_to(self, conversation: Conversation, **kwargs) -> None:
         """Respond to the latest query in the conversation."""
