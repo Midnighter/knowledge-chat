@@ -38,5 +38,5 @@ class ExchangeOutputDTO(BaseModel):
         # We bypass model validation because we trust our data on the way out.
         return cls.model_construct(
             query=exchange.query.text,
-            email=exchange.response.text,
+            response=exchange.response.text,
         )
