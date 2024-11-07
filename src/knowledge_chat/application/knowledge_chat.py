@@ -17,6 +17,7 @@
 
 from uuid import UUID
 
+import structlog
 from eventsourcing.application import AggregateNotFoundError, Application
 from eventsourcing.utils import EnvType
 from langchain_community.graphs import Neo4jGraph
@@ -28,6 +29,9 @@ from knowledge_chat.domain.model import Conversation, Query, User
 from knowledge_chat.domain.service import DomainServiceRegistry
 
 from .dto import ConversationDTO, ExchangeOutputDTO, UserDTO
+
+
+logger = structlog.get_logger(__name__)
 
 
 class KnowledgeChat(Application):
@@ -97,8 +101,10 @@ class KnowledgeChat(Application):
     ) -> ExchangeOutputDTO:
         """Use a configured agent to respond to the given query."""
         conversation = self._get_conversation(conversation_id)
+        logger.debug("CONVERSATION_RESTORED")
 
         conversation.raise_query(Query(text=query))
+        logger.debug("QUERY_RAISED")
 
         agent = self.domain_service_registry.get_response_agent(
             "knowledge_chat.infrastructure.domain.service."
@@ -106,8 +112,10 @@ class KnowledgeChat(Application):
             self.knowledge_graph,
             self.chat_model,
         )
+        logger.debug("AGENT_CREATED")
 
         agent.respond_to(conversation, callbacks=callbacks)
+        logger.debug("RESPONSE_GENERATED")
 
         self.save(conversation)
         return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)

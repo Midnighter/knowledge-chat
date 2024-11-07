@@ -19,6 +19,7 @@ from uuid import UUID
 
 import chainlit as cl
 import structlog
+from structlog.contextvars import bind_contextvars, clear_contextvars
 
 from knowledge_chat.application import KnowledgeChat, UserDTO
 from knowledge_chat.infrastructure.domain.service import LangchainDomainServiceRegistry
@@ -38,24 +39,29 @@ chat_app = KnowledgeChat(
 @cl.on_chat_start
 def init() -> None:
     """Initialize the user and chat."""
+    clear_contextvars()
+    bind_contextvars(user_session_id=cl.user_session.get("id"))
     logger.debug("CHAINLIT_ON_CHAT_STARTED")
-    logger.debug("USER_SESSION_ID_INSPECTED", user_session_id=cl.user_session.get("id"))
 
     try:
         user_id = UUID(cl.user_session.get("user-id", None))
-        logger.debug("EXISTING_USER_RESTORED", user_id=user_id)
+        bind_contextvars(user_id=user_id)
+        logger.debug("EXISTING_USER_RESTORED")
     except TypeError:
         user_id = chat_app.create_user(UserDTO(name="anon", email="anon@me"))
+        bind_contextvars(user_id=user_id)
         cl.user_session.set("user-id", str(user_id))
-        logger.debug("NEW_USER_CREATED", user_id=user_id)
+        logger.debug("NEW_USER_CREATED")
 
     try:
         conversation_id = UUID(cl.user_session.get("conversation-id"))
-        logger.debug("EXISTING_CONVERSATION_RESTORED", conversation_id=conversation_id)
+        bind_contextvars(conversation_id=conversation_id)
+        logger.debug("EXISTING_CONVERSATION_RESTORED")
     except TypeError:
         conversation_id = chat_app.start_conversation(user_id)
+        bind_contextvars(conversation_id=conversation_id)
         cl.user_session.set("conversation-id", str(conversation_id))
-        logger.debug("NEW_CONVERSATION_STARTED", conversation_id=conversation_id)
+        logger.debug("NEW_CONVERSATION_STARTED")
 
     logger.debug("CHAINLIT_ON_CHAT_ENDED")
 
@@ -63,14 +69,19 @@ def init() -> None:
 @cl.on_message
 async def chat(message: cl.Message) -> None:
     """Chat with the user-specific agent."""
-    logger.debug("USER_SESSION_ID_INSPECTED", user_session_id=cl.user_session.get("id"))
+    clear_contextvars()
+    bind_contextvars(user_session_id=cl.user_session.get("id"))
+
+    user_id = UUID(cl.user_session.get("user-id"))
+    bind_contextvars(user_id=user_id)
 
     conversation_id = UUID(cl.user_session.get("conversation-id"))
-    logger.debug("EXISTING_CONVERSATION_RESTORED", conversation_id=conversation_id)
+    bind_contextvars(conversation_id=conversation_id)
 
     async_respond_to = cl.make_async(chat_app.respond_to)
     exchange = await async_respond_to(
         query=message.content,
         conversation_id=conversation_id,
+        callbacks=[cl.LangchainCallbackHandler()],
     )
     await cl.Message(content=exchange.response).send()
