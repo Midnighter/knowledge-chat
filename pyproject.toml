@@ -182,7 +182,8 @@ layers = [
 description = """
 Development environment.
 
-A workaround for PyCharm, see https://youtrack.jetbrains.com/issue/PY-60410.
+Defining a path is a workaround for PyCharm,
+see https://youtrack.jetbrains.com/issue/PY-60410.
 """
 extra-dependencies = [
     "pytest",
