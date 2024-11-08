@@ -15,6 +15,7 @@
 
 """Provide the knowledge chat application."""
 
+from time import perf_counter_ns
 from uuid import UUID
 
 import structlog
@@ -106,16 +107,18 @@ class KnowledgeChat(Application):
         conversation.raise_query(Query(text=query))
         logger.debug("QUERY_RAISED")
 
+        start = perf_counter_ns()
         agent = self.domain_service_registry.get_response_agent(
             "knowledge_chat.infrastructure.domain.service."
             "langchain_kshot_response_agent:LangchainKShotResponseAgent",
             self.knowledge_graph,
             self.chat_model,
         )
-        logger.debug("AGENT_CREATED")
+        logger.debug("AGENT_CREATED", duration=perf_counter_ns() - start)
 
+        start = perf_counter_ns()
         agent.respond_to(conversation, callbacks=callbacks)
-        logger.debug("RESPONSE_GENERATED")
+        logger.debug("RESPONSE_GENERATED", duration=perf_counter_ns() - start)
 
         self.save(conversation)
         return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)
