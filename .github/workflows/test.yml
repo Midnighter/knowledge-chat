@@ -1,6 +1,9 @@
 name: Test Suite
 
 on:
+  push:
+    branches:
+      - debug-hatch-ci
   workflow_dispatch: {}
   workflow_call: {}
 
