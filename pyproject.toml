@@ -206,6 +206,7 @@ see https://youtrack.jetbrains.com/issue/PY-60410.
 """
 extra-dependencies = [
     "chainlit ~=1.3",
+    "humanize ~=1.0",
     "pytest",
 ]
 features = ["ollama", "openai"]
