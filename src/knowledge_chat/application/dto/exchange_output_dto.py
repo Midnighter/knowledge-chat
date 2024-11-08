@@ -30,7 +30,7 @@ class ExchangeOutputDTO(BaseModel):
     """Define the exchange output data transfer object (DTO)."""
 
     query: str
-    response: str
+    response: str | None
 
     @classmethod
     def from_exchange(cls, exchange: Exchange) -> ExchangeOutputDTO:
@@ -38,5 +38,5 @@ class ExchangeOutputDTO(BaseModel):
         # We bypass model validation because we trust our data on the way out.
         return cls.model_construct(
             query=exchange.query.text,
-            response=exchange.response.text,
+            response=None if exchange.response is None else exchange.response.text,
         )
