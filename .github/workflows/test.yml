@@ -5,44 +5,13 @@ on:
   workflow_call: {}
 
 jobs:
-  lint:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install hatch
-        uses: pypa/hatch@install
-
-      - name: Check code style
-        run: hatch run style:code
-
-      - name: Check docstrings
-        run: hatch run style:docstrings
-
-      - name: Lint imports
-        run: hatch run imports:check
-
-      - name: Build documentation
-        run: hatch run docs:build
-
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.12", "3.13"]
+        os: [macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v4
@@ -55,18 +24,9 @@ jobs:
     - name: Install hatch
       uses: pypa/hatch@install
 
+    - name: Debug output
+      run: |
+        cat "/Users/runner/Library/Application Support/pyapp/hatch/15969350296226343517/1.13.0/python/bin/hatch"
+
     - name: Check installation
       run: hatch run install:check
-
-    - name: Check dependencies
-      run: hatch run audit:check
-
-    - name: Check types
-      run: hatch run types:check
-
-    - name: Test suite
-      run: hatch run +py=${{ matrix.python-version }} test:run
-
-    - name: Report coverage
-      shell: bash
-      run: bash <(curl -s https://codecov.io/bash)
