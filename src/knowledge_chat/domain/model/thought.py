@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any, NamedTuple
 
 
@@ -26,3 +27,11 @@ class Thought(NamedTuple):
     subquery: str
     context: Any
     parent: Thought | None = None
+
+    def with_parent(self, parent: Thought) -> Thought:
+        """Return a copy of the thought with a parent set."""
+        return type(self)(
+            subquery=self.subquery,
+            context=deepcopy(self.context),
+            parent=parent,
+        )
