@@ -30,6 +30,7 @@ jobs:
     - name: Debug output
       run: |
         cat "/Users/runner/Library/Application Support/pyapp/hatch/15969350296226343517/1.13.0/python/bin/hatch"
+        ls -lah "/Users/runner/Library/Application Support/pyapp/hatch/15969350296226343517/1.13.0/python/bin"
 
     - name: Check installation
       run: hatch run install:check
