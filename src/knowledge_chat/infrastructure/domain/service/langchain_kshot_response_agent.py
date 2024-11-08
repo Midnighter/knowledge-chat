@@ -20,6 +20,7 @@ from typing import Any
 import structlog
 from langchain_core.tracers.base import BaseTracer
 
+from knowledge_chat.domain.error import KnowledgeChatError
 from knowledge_chat.domain.model import Conversation, Response, Thought
 from knowledge_chat.domain.service import ResponseAgent
 
@@ -43,12 +44,16 @@ class LangchainKShotResponseAgent(ResponseAgent):
         **_,
     ) -> None:
         """Ask a question to the agent and return a response."""
+        if conversation.latest_exchange is None:
+            raise KnowledgeChatError(message="No query present to respond to.")
+
         result = self._chain.invoke(
             # TODO (Moritz): Careful, this is a train wreck.  # noqa: FIX002, TD003
             {"query": conversation.latest_exchange.query.text},
             callbacks=callbacks,
         )
         logger.debug("LANGCHAIN_RESULT_GENERATED", result=result)
+
         assert len(result["intermediate_steps"]) == 2  # noqa: PLR2004, S101
         query: str | None = None
         context: Any | None = None
@@ -57,5 +62,8 @@ class LangchainKShotResponseAgent(ResponseAgent):
                 query = obj["query"]
             if "context" in obj:
                 context = obj["context"]
+        assert query is not None  # noqa: S101
+        assert context is not None  # noqa: S101
+
         conversation.add_thought(Thought(subquery=query, context=context))
         conversation.respond(Response(text=result["result"]))

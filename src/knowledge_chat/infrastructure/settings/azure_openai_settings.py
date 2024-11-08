@@ -78,9 +78,9 @@ class AzureOpenAISettings(BaseSettings):
         """Return a langchain Azure OpenAI chat model instance."""
         return AzureChatOpenAI(
             azure_endpoint=f"https://{self.service}.openai.azure.com",
-            openai_api_key=self.api_key.get_secret_value(),
+            openai_api_key=self.api_key.get_secret_value(),  # type: ignore[arg-type]
             openai_api_version=self.api_version,
-            azure_deployment=self.deployment_name,
+            azure_deployment=self.deployment_name,  # type: ignore[call-arg]
             model_name=self.model_name,
             temperature=self.temperature,
         )

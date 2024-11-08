@@ -128,4 +128,5 @@ class KnowledgeChat(Application):
         )
 
         self.save(conversation)
+        assert conversation.latest_exchange is not None  # noqa: S101
         return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)
