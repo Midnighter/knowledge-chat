@@ -15,7 +15,8 @@
 
 """Create a chainlit application for the example knowledge chat."""
 
-from time import perf_counter_ns
+from datetime import timedelta
+from time import perf_counter
 from uuid import UUID
 
 import chainlit as cl
@@ -41,6 +42,7 @@ chat_app = KnowledgeChat(
 @cl.on_chat_start
 def init() -> None:
     """Initialize the user and chat."""
+    start = perf_counter()
     clear_contextvars()
     bind_contextvars(user_session_id=cl.user_session.get("id"))
     logger.debug("CHAINLIT_ON_CHAT_STARTED")
@@ -65,13 +67,14 @@ def init() -> None:
         cl.user_session.set("conversation-id", str(conversation_id))
         logger.debug("NEW_CONVERSATION_STARTED")
 
-    logger.debug("CHAINLIT_ON_CHAT_ENDED")
+    duration = timedelta(seconds=perf_counter() - start)
+    logger.debug("CHAINLIT_ON_CHAT_ENDED", duration=duration)
 
 
 @cl.on_message
 async def chat(message: cl.Message) -> None:
     """Chat with the user-specific agent."""
-    start = perf_counter_ns()
+    start = perf_counter()
     clear_contextvars()
     bind_contextvars(user_session_id=cl.user_session.get("id"))
 
@@ -88,4 +91,5 @@ async def chat(message: cl.Message) -> None:
         callbacks=[cl.LangchainCallbackHandler()],
     )
     await cl.Message(content=exchange.response).send()
-    await logger.adebug("MESSAGE_REPLIED", duration=perf_counter_ns() - start)
+    duration = timedelta(seconds=perf_counter() - start)
+    await logger.adebug("MESSAGE_REPLIED", duration=duration)
