@@ -15,6 +15,7 @@
 
 """Create a chainlit application for the example knowledge chat."""
 
+from time import perf_counter_ns
 from uuid import UUID
 
 import chainlit as cl
@@ -70,6 +71,7 @@ def init() -> None:
 @cl.on_message
 async def chat(message: cl.Message) -> None:
     """Chat with the user-specific agent."""
+    start = perf_counter_ns()
     clear_contextvars()
     bind_contextvars(user_session_id=cl.user_session.get("id"))
 
@@ -86,3 +88,4 @@ async def chat(message: cl.Message) -> None:
         callbacks=[cl.LangchainCallbackHandler()],
     )
     await cl.Message(content=exchange.response).send()
+    await logger.adebug("MESSAGE_REPLIED", duration=perf_counter_ns() - start)
