@@ -7,12 +7,13 @@
 # COMMANDS                                                                     #
 ################################################################################
 
-.PHONY: setup
-## Prepare example project
-setup: movies model app
+.PHONY: install
+## Prepare example project (movies, model, app)
+install: install-movies install-model install-app
 
-.PHONY: movies
-movies:
+.PHONY: install-movies
+## Load the movies graph
+install-movies:
 	docker compose up -d knowledge-graph
 	./wait-for-it.sh localhost:7474 --strict -- wget --spider --no-verbose localhost:7474/
 	docker compose exec knowledge-graph cypher-shell \
@@ -21,15 +22,17 @@ movies:
 		-f /opt/scripts/movies.cypher
 	docker compose stop knowledge-graph
 
-.PHONY: model
-model:
+.PHONY: install-model
+## Preload llama3.2 model
+install-model:
 	docker compose up -d ollama
 	./wait-for-it.sh localhost:11434 --strict -- wget --spider --no-verbose localhost:11434/
 	docker compose exec ollama ollama pull 'llama3.2'
 	docker compose stop ollama
 
-.PHONY: app
-app:
+.PHONY: install-app
+## Generate wheel and build Docker image
+install-app:
 	cd ..; hatch run example:deploy
 	docker compose build
 
