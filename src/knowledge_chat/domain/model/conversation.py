@@ -81,7 +81,7 @@ class Conversation(Aggregate):
     @event(ThoughtAdded)
     def add_thought(self, thought: Thought) -> None:
         """Add a new thought."""
-        if not self._exchanges:
+        if self.latest_exchange is None:
             raise KnowledgeChatError(
                 message="There is no exchange; raise a query first.",
             )
@@ -99,7 +99,7 @@ class Conversation(Aggregate):
     @event(QueryRespondedTo)
     def respond(self, response: Response) -> None:
         """Add a new thought."""
-        if not self._exchanges:
+        if self.latest_exchange is None:
             raise KnowledgeChatError(
                 message="There is no exchange; raise a query first.",
             )
