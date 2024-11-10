@@ -13,7 +13,6 @@
 # the License.
 
 
-"""Provide the application code layer."""
+"""Provide concrete implementations for abstract application interfaces."""
 
-from .dto import UserDTO, ConversationDTO, ExchangeOutputDTO
-from .abstract_knowledge_chat import AbstractKnowledgeChat
+from .knowledge_chat import KnowledgeChat

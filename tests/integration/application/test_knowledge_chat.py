@@ -17,8 +17,8 @@
 
 import pytest
 
-from knowledge_chat.application import KnowledgeChat
 from knowledge_chat.application.dto import ConversationDTO, UserDTO
+from knowledge_chat.infrastructure.application import KnowledgeChat
 
 
 @pytest.fixture

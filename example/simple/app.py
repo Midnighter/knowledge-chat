@@ -23,7 +23,8 @@ import chainlit as cl
 import structlog
 from structlog.contextvars import bind_contextvars, clear_contextvars
 
-from knowledge_chat.application import KnowledgeChat, UserDTO
+from knowledge_chat.application import UserDTO
+from knowledge_chat.infrastructure.application import KnowledgeChat
 from knowledge_chat.infrastructure.domain.service import LangchainDomainServiceRegistry
 from knowledge_chat.infrastructure.settings.neo4j_settings import Neo4jSettings
 from knowledge_chat.infrastructure.settings.ollama_settings import OllamaSettings

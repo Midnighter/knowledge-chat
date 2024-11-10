@@ -21,22 +21,28 @@ from uuid import UUID
 
 import structlog
 from eventsourcing.application import AggregateNotFoundError, Application
+from eventsourcing.persistence import Transcoder
 from eventsourcing.utils import EnvType
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tracers.base import BaseTracer
 
+from knowledge_chat.application import (
+    AbstractKnowledgeChat,
+    ConversationDTO,
+    ExchangeOutputDTO,
+    UserDTO,
+)
 from knowledge_chat.domain.error import NotFoundError
 from knowledge_chat.domain.model import Conversation, Query, User
 from knowledge_chat.domain.service import DomainServiceRegistry
-
-from .dto import ConversationDTO, ExchangeOutputDTO, UserDTO
+from knowledge_chat.infrastructure.persistence.transcoding import TimedeltaAsDict
 
 
 logger = structlog.get_logger(__name__)
 
 
-class KnowledgeChat(Application):
+class KnowledgeChat(Application, AbstractKnowledgeChat):
     """Define the knowledge chat application."""
 
     def __init__(
@@ -52,6 +58,11 @@ class KnowledgeChat(Application):
         self.domain_service_registry = domain_service_registry
         self.knowledge_graph = knowledge_graph
         self.chat_model = chat_model
+
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for this application."""
+        super().register_transcodings(transcoder=transcoder)
+        transcoder.register(TimedeltaAsDict())
 
     def create_user(self, user: UserDTO) -> UUID:
         """Create a new user instance and persist it."""
