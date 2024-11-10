@@ -37,7 +37,7 @@ class LangchainKShotResponseAgent(ResponseAgent):
 
     """
 
-    def respond_to(
+    def generate_response(
         self,
         conversation: Conversation,
         callbacks: list[BaseTracer] | None = None,

@@ -121,7 +121,7 @@ class KnowledgeChat(Application):
         )
 
         start = perf_counter()
-        agent.respond_to(conversation, callbacks=callbacks)
+        agent.generate_response(conversation, callbacks=callbacks)
         logger.debug(
             "RESPONSE_GENERATED",
             duration=timedelta(seconds=perf_counter() - start),

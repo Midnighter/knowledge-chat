@@ -31,7 +31,7 @@ class ResponseAgent(ABC):
         self._chain = chain
 
     @abstractmethod
-    def respond_to(
+    def generate_response(
         self,
         conversation: Conversation,
         callbacks: list[BaseTracer] | None = None,

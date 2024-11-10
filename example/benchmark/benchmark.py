@@ -54,7 +54,7 @@ def main():
         ),
     )
     start = perf_counter()
-    agent.respond_to(convo)
+    agent.generate_response(convo)
     duration = timedelta(seconds=perf_counter() - start)
     logger.info(
         "RESPONSE_GENERATED",
@@ -67,7 +67,7 @@ def main():
         ),
     )
     start = perf_counter()
-    agent.respond_to(convo)
+    agent.generate_response(convo)
     duration = timedelta(seconds=perf_counter() - start)
     logger.info(
         "RESPONSE_GENERATED",
