@@ -29,11 +29,11 @@ latex = false
 auto_tag_thread = true
 
 # Allow users to edit their own messages
-edit_message = true
+edit_message = false
 
 # Authorize users to spontaneously upload files with messages
 [features.spontaneous_file_upload]
-    enabled = true
+    enabled = false
     accept = ["*/*"]
     max_files = 20
     max_size_mb = 500
@@ -54,7 +54,7 @@ edit_message = true
 
 [UI]
 # Name of the assistant.
-name = "Assistant"
+name = "Knowledge Bot"
 
 # Description of the assistant. This is used for HTML tags.
 # description = ""
@@ -62,11 +62,15 @@ name = "Assistant"
 # Large size content are by default collapsed for a cleaner ui
 default_collapse_content = true
 
+# Sub-messages are hiden by default, you can “expand” the parent message to
+# show those messages. Toggling this setting will display the sub-messages by default.
+default_expand_message = false
+
 # Chain of Thought (CoT) display mode. Can be "hidden", "tool_call" or "full".
 cot = "full"
 
 # Link to your github repo. This will add a github button in the UI's header.
-# github = ""
+github = "https://github.com/Midnighter/knowledge-chat"
 
 # Specify a CSS file that can be used to customize the user interface.
 # The CSS file can be served from the public directory or via an external link.
