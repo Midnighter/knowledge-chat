@@ -34,7 +34,7 @@ services:
       timeout: 10s
       retries: 10
       start_period: 30s
-    image: neo4j:5-community
+    image: graphstack/dozerdb:5.24.2
     ports:
       - "7474:7474"
       - "7687:7687"
