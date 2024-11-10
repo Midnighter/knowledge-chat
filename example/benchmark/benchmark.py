@@ -1,3 +1,25 @@
+# Copyright (c) 2024 Moritz E. Beber
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+
+"""
+Provide extremely simple benchmarking.
+
+Should be moved into the test suite.
+
+"""
+
 from datetime import timedelta
 from time import perf_counter
 
@@ -13,7 +35,8 @@ from knowledge_chat.infrastructure.settings.ollama_settings import OllamaSetting
 logger = structlog.get_logger()
 
 
-def main():
+def main() -> None:
+    """Run benchmarks."""
     neo4j_settings = Neo4jSettings.create()
     ollama_settings = OllamaSettings.create()
     service_registry = LangchainDomainServiceRegistry()
@@ -50,7 +73,8 @@ def main():
 
     convo.raise_query(
         Query(
-            text="What is the name of the person who acted in the least number of movies?",
+            text="What is the name of the person who acted in the least number of "
+            "movies?",
         ),
     )
     start = perf_counter()
@@ -63,7 +87,8 @@ def main():
 
     convo.raise_query(
         Query(
-            text="What is the name of the person who acted in the least number of movies?",
+            text="What is the name of the person who acted in the least number of "
+            "movies?",
         ),
     )
     start = perf_counter()
