@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        TARGET: "${TARGET:-simple}"
     command: [ "chainlit", "run", "--headless", "--watch", "--host", "0.0.0.0", "app.py" ]
     depends_on:
       knowledge-graph:
@@ -16,7 +18,7 @@ services:
       - "NEO4J_PASSWORD=${NEO4J_PASSWORD:-supersecret}"
       - "NEO4J_CONNECTION_URI=bolt://knowledge-graph:7687"
       - "OLLAMA_URL=http://ollama:11434"
-    image: movies-chat
+    image: movies-chat:${TARGET:-simple}
     ports:
       - "8000:8000"
     volumes:

@@ -20,7 +20,9 @@ WORKDIR /opt/chat
 
 RUN pip install --no-cache-dir --no-deps dist/knowledge_chat*.whl
 
-COPY ./app .
+ARG TARGET
+
+COPY "./${TARGET}" .
 
 EXPOSE 8000
 
