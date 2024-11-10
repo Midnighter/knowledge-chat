@@ -15,6 +15,7 @@
 
 """Test the conversation aggregate."""
 
+from datetime import timedelta
 from uuid import UUID, uuid4
 
 import pytest
@@ -102,7 +103,9 @@ def test_respond():
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
     conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
-    conversation.respond(Response("Because!"))
+    conversation.respond(
+        Response(text="Because!", generation_time=timedelta(seconds=0)),
+    )
 
     assert isinstance(conversation.collect_events()[-1], Conversation.QueryRespondedTo)
     assert conversation.latest_exchange.is_closed
@@ -114,7 +117,9 @@ def test_cannot_respond_without_exchange():
     conversation = Conversation(user_reference=user_ref)
 
     with pytest.raises(KnowledgeChatError):
-        conversation.respond(Response("Doh!"))
+        conversation.respond(
+            Response(text="Doh!", generation_time=timedelta(seconds=0)),
+        )
 
 
 def test_cannot_add_thought_on_closed():
@@ -123,7 +128,9 @@ def test_cannot_add_thought_on_closed():
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
     conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
-    conversation.respond(Response("Because!"))
+    conversation.respond(
+        Response(text="Because!", generation_time=timedelta(seconds=0)),
+    )
 
     with pytest.raises(KnowledgeChatError):
         conversation.add_thought(
@@ -137,7 +144,11 @@ def test_cannot_respond_twice():
     conversation = Conversation(user_reference=user_ref)
     conversation.raise_query(Query(text="Me first?"))
     conversation.add_thought(Thought(subquery="Where am I?", context="You are here."))
-    conversation.respond(Response("Because!"))
+    conversation.respond(
+        Response(text="Because!", generation_time=timedelta(seconds=0)),
+    )
 
     with pytest.raises(KnowledgeChatError):
-        conversation.respond(Response("Really?!"))
+        conversation.respond(
+            Response(text="Really?!", generation_time=timedelta(seconds=0)),
+        )
