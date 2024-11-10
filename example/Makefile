@@ -2,6 +2,9 @@
 # VARIABLES                                                                    #
 ################################################################################
 
+NEO4J_USERNAME ?= neo4j
+NEO4J_PASSWORD ?= supersecret
+OLLAMA_MODELS ?= llama3.2 llama3.1:8b gemma2:9b
 
 ################################################################################
 # COMMANDS                                                                     #
@@ -9,26 +12,49 @@
 
 .PHONY: install
 ## Prepare example project (movies, model, app)
-install: install-movies install-model install-app
+install: install-graphs install-models install-app
 
-.PHONY: install-movies
-## Load the movies graph
-install-movies:
-	docker compose up -d knowledge-graph
+.PHONY: install-graphs
+## Load the graph databases
+install-graphs:
+	docker compose ps --format "{{.Service}} {{.State}}" | \
+		grep 'knowledge-graph running' || \
+		docker compose up -d knowledge-graph
 	./wait-for-it.sh localhost:7474 --strict -- wget --spider --no-verbose localhost:7474/
-	docker compose exec knowledge-graph cypher-shell \
-		-u neo4j \
-		-p supersecret \
-		-f /opt/scripts/movies.cypher
-	docker compose stop knowledge-graph
 
-.PHONY: install-model
-## Preload llama3.2 model
-install-model:
-	docker compose up -d ollama
+	docker compose exec knowledge-graph cypher-shell \
+		--username "$(NEO4J_USERNAME)" \
+		--password "$(NEO4J_PASSWORD)" \
+		"CREATE DATABASE movies;"
+
+	docker compose exec knowledge-graph cypher-shell \
+		--username "$(NEO4J_USERNAME)" \
+		--password "$(NEO4J_PASSWORD)" \
+		--database 'movies' \
+		--file '/opt/scripts/movies.cypher'
+
+	docker compose exec knowledge-graph cypher-shell \
+		--username "$(NEO4J_USERNAME)" \
+		--password "$(NEO4J_PASSWORD)" \
+		"CREATE DATABASE starwars;"
+
+	docker compose exec knowledge-graph cypher-shell \
+		--username "$(NEO4J_USERNAME)" \
+		--password "$(NEO4J_PASSWORD)" \
+		--database 'starwars' \
+		--file '/opt/scripts/star-wars.cypher'
+
+.PHONY: install-models
+## Preload Ollama models
+install-models:
+	docker compose ps --format "{{.Service}} {{.State}}" | \
+		grep 'ollama running' || \
+		docker compose up -d ollama
 	./wait-for-it.sh localhost:11434 --strict -- wget --spider --no-verbose localhost:11434/
-	docker compose exec ollama ollama pull 'llama3.2'
-	docker compose stop ollama
+
+	for model in $(OLLAMA_MODELS); do \
+		docker compose exec ollama ollama pull "$$model"; \
+	done
 
 .PHONY: install-app
 ## Generate wheel and build Docker image
