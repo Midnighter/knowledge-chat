@@ -22,7 +22,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - "./app:/opt/chat"
+      - "./${TARGET:-simple}:/opt/chat"
       - "./data:/opt/data"
 
   knowledge-graph:
