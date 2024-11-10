@@ -84,12 +84,18 @@ async def chat(message: cl.Message) -> None:
     conversation_id = UUID(cl.user_session.get("conversation-id"))
     bind_contextvars(conversation_id=conversation_id)
 
-    async_respond_to = cl.make_async(chat_app.respond_to)
-    exchange = await async_respond_to(
-        query=message.content,
-        conversation_id=conversation_id,
-        callbacks=[cl.LangchainCallbackHandler()],
-    )
+    try:
+        exchange = await cl.make_async(chat_app.respond_to)(
+            query=message.content,
+            conversation_id=conversation_id,
+            callbacks=[cl.LangchainCallbackHandler()],
+        )
+    except Exception as error:
+        await cl.Message(
+            content="The bot ran into an error. Rephrase your query and try again.",
+            elements=[cl.Text(name="Error", content=str(error))],
+        ).send()
+        raise
     await cl.Message(content=exchange.response).send()
     duration = timedelta(seconds=perf_counter() - start)
     await logger.adebug("MESSAGE_REPLIED", duration=duration)
