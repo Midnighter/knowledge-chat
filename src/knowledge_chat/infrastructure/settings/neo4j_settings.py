@@ -21,8 +21,19 @@ import warnings
 from typing import Annotated
 
 from langchain_community.graphs import Neo4jGraph
-from pydantic import AnyUrl, Field, SecretStr  # noqa: TCH002
+from pydantic import AnyUrl, Field, SecretStr, StringConstraints
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+Neo4jDatabaseName = Annotated[
+    str,
+    StringConstraints(
+        min_length=3,
+        max_length=63,
+        pattern=r"^[a-z][a-z0-9]{2, 62}$",
+        to_lower=True,
+    ),
+]
 
 
 class Neo4jSettings(BaseSettings):
@@ -45,6 +56,13 @@ class Neo4jSettings(BaseSettings):
         SecretStr,
         Field(..., validation_alias="NEO4J_PASSWORD"),
     ]
+    database: Annotated[
+        Neo4jDatabaseName | None,
+        Field(
+            default=None,
+            validation_alias="NEO4J_DATABASE",
+        ),
+    ]
     timeout: Annotated[float, Field(default=30.0, validation_alias="NEO4J_TIMEOUT")]
 
     @classmethod
@@ -64,6 +82,7 @@ class Neo4jSettings(BaseSettings):
             url=str(self.connection_uri),
             username=self.username,
             password=self.password.get_secret_value(),
+            database=self.database,
             timeout=self.timeout,
             enhanced_schema=True,
         )
