@@ -15,6 +15,8 @@
 
 """Provide a concrete chat agent implementation using langchain."""
 
+from datetime import timedelta
+from time import perf_counter
 from typing import Any
 
 import structlog
@@ -47,12 +49,17 @@ class LangchainKShotResponseAgent(ResponseAgent):
         if conversation.latest_exchange is None:
             raise KnowledgeChatError(message="No query present to respond to.")
 
+        start = perf_counter()
         result = self._chain.invoke(
             # TODO (Moritz): Careful, this is a train wreck.  # noqa: FIX002, TD003
             {"query": conversation.latest_exchange.query.text},
             callbacks=callbacks,
         )
-        logger.debug("LANGCHAIN_RESULT_GENERATED", result=result)
+        logger.debug(
+            "LANGCHAIN_RESULT_GENERATED",
+            result=result,
+            duration=timedelta(seconds=perf_counter() - start),
+        )
 
         assert len(result["intermediate_steps"]) == 2  # noqa: PLR2004, S101
         query: str | None = None
