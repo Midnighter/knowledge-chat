@@ -16,8 +16,17 @@
 """Provide transcoding for custom data types."""
 
 from datetime import timedelta
+from typing import TypedDict
 
 from eventsourcing.persistence import Transcoding
+
+
+class EncodedTimedelta(TypedDict):
+    """Define the dictionary representation of a timedelta object."""
+
+    days: int
+    seconds: int
+    microseconds: int
 
 
 class TimedeltaAsDict(Transcoding):
@@ -26,14 +35,14 @@ class TimedeltaAsDict(Transcoding):
     type = timedelta
     name = "timedelta"
 
-    def encode(self, obj: timedelta) -> dict:
+    def encode(self, obj: timedelta) -> EncodedTimedelta:
         """Encode a timedelta as a dictionary."""
-        return {
-            "days": obj.days,
-            "seconds": obj.seconds,
-            "microseconds": obj.microseconds,
-        }
+        return EncodedTimedelta(
+            days=obj.days,
+            seconds=obj.seconds,
+            microseconds=obj.microseconds,
+        )
 
-    def decode(self, data: dict) -> timedelta:
+    def decode(self, data: EncodedTimedelta) -> timedelta:
         """Decode a dictionary as a timedelta."""
         return timedelta(**data)
