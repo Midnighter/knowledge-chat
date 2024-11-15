@@ -5,6 +5,7 @@
 NEO4J_USERNAME ?= neo4j
 NEO4J_PASSWORD ?= supersecret
 OLLAMA_MODELS ?= llama3.2 llama3.1:8b gemma2:9b
+TARGET ?= simple
 
 ################################################################################
 # COMMANDS                                                                     #
@@ -60,7 +61,7 @@ install-models:
 ## Generate wheel and build Docker image
 install-app:
 	cd ..; hatch run example:deploy
-	docker compose build
+	TARGET=$(TARGET) docker compose build
 
 ################################################################################
 # Self Documenting Commands                                                    #

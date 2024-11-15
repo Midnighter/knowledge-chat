@@ -1,4 +1,5 @@
 *
 !requirements.txt
-!simple/
 !dist/
+!simple/
+!advanced/
