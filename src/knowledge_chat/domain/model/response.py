@@ -15,7 +15,6 @@
 
 """Provide a value object for an agent's response."""
 
-from datetime import timedelta
 from typing import NamedTuple
 
 
@@ -23,7 +22,6 @@ class Response(NamedTuple):
     """Define an agent's response, the end of an exchange."""
 
     text: str
-    generation_time: timedelta
 
     def __str__(self) -> str:
         """Return a string representation of the response."""

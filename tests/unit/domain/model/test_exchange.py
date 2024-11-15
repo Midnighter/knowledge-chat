@@ -15,8 +15,6 @@
 
 """Test the exchange aggregate."""
 
-from datetime import timedelta
-
 import pytest
 
 from knowledge_chat.domain.error import KnowledgeChatError
@@ -61,7 +59,7 @@ def test_close():
     """Test that a response closes an exchange."""
     exchange = Exchange(query=Query(text="What gives?"))
     exchange.add_thought(Thought(subquery="provocation", context="first"))
-    exchange.close(Response(text="Therefore.", generation_time=timedelta(seconds=0)))
+    exchange.close(Response(text="Therefore."))
 
     assert exchange.is_closed
 
@@ -70,16 +68,14 @@ def test_close_without_thought():
     """Test that closing an exchange without thoughts emits a warning."""
     exchange = Exchange(query=Query(text="What gives?"))
     with pytest.warns(UserWarning):
-        exchange.close(
-            Response(text="Accept it.", generation_time=timedelta(seconds=0)),
-        )
+        exchange.close(Response(text="Accept it."))
 
 
 def test_cannot_add_thought():
     """Test that a thought cannot be added to a closed exchange."""
     exchange = Exchange(query=Query(text="What gives?"))
     exchange.add_thought(Thought(subquery="provocation", context="first"))
-    exchange.close(Response(text="Therefore.", generation_time=timedelta(seconds=0)))
+    exchange.close(Response(text="Therefore."))
 
     with pytest.raises(KnowledgeChatError):
         exchange.add_thought(Thought(subquery="provocation", context="second"))
@@ -89,7 +85,7 @@ def test_cannot_respond_twice():
     """Test that a closed exchange cannot be responded to."""
     exchange = Exchange(query=Query(text="What gives?"))
     exchange.add_thought(Thought(subquery="provocation", context="first"))
-    exchange.close(Response(text="Therefore.", generation_time=timedelta(seconds=0)))
+    exchange.close(Response(text="Therefore."))
 
     with pytest.raises(KnowledgeChatError):
-        exchange.close(Response(text="Oh no!", generation_time=timedelta(seconds=0)))
+        exchange.close(Response(text="Oh no!"))
