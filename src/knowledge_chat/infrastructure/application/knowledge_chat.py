@@ -21,7 +21,7 @@ from uuid import UUID
 
 import structlog
 from eventsourcing.application import AggregateNotFoundError, Application
-from eventsourcing.persistence import Transcoder
+from eventsourcing.persistence import Recording, Transcoder
 from eventsourcing.utils import EnvType
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -117,7 +117,6 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
         logger.debug("CONVERSATION_RESTORED")
 
         conversation.raise_query(Query(text=query))
-        logger.debug("QUERY_RAISED")
 
         start = perf_counter()
         agent = self.domain_service_registry.get_response_agent(
@@ -137,7 +136,11 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
             "RESPONSE_GENERATED",
             duration=timedelta(seconds=perf_counter() - start),
         )
-
         self.save(conversation)
         assert conversation.latest_exchange is not None  # noqa: S101
         return ExchangeOutputDTO.from_exchange(conversation.latest_exchange)
+
+    def _notify(self, recordings: list[Recording]) -> None:
+        super()._notify(recordings)
+        for recording in recordings:
+            logger.debug("EVENT_RECORDED", recording=recording.domain_event)
