@@ -18,3 +18,4 @@
 from .user_dto import UserDTO
 from .conversation_dto import ConversationDTO
 from .exchange_output_dto import ExchangeOutputDTO
+from .neo4j_settings import Neo4jSettings

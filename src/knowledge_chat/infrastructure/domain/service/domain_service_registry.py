@@ -21,11 +21,26 @@ from langchain_community.chains.graph_qa.cypher import GraphCypherQAChain
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
 
+from knowledge_chat.application.dto import Neo4jSettings
 from knowledge_chat.domain.service import DomainServiceRegistry, ResponseAgent
 
 
 class LangchainDomainServiceRegistry(DomainServiceRegistry):
     """Define the abstract interface for the domain service registry."""
+
+    def create_knowledge_graph(
+        self,
+        knowledge_graph_settings: Neo4jSettings,
+    ) -> Neo4jGraph:
+        """Return a knowledge graph service instance with a langchain interface."""
+        return Neo4jGraph(
+            url=str(knowledge_graph_settings.connection_uri),
+            username=knowledge_graph_settings.username,
+            password=knowledge_graph_settings.password.get_secret_value(),
+            database=knowledge_graph_settings.database,
+            timeout=knowledge_graph_settings.timeout,
+            enhanced_schema=True,
+        )
 
     def get_response_agent(
         self,

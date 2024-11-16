@@ -20,7 +20,6 @@ from __future__ import annotations
 import warnings
 from typing import Annotated
 
-from langchain_community.graphs import Neo4jGraph
 from pydantic import AnyUrl, Field, SecretStr, StringConstraints
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -75,14 +74,3 @@ class Neo4jSettings(BaseSettings):
                 category=UserWarning,
             )
             return cls(**kwargs)
-
-    def create_graph(self) -> Neo4jGraph:
-        """Return a Neo4j graph instance with a langchain interface."""
-        return Neo4jGraph(
-            url=str(self.connection_uri),
-            username=self.username,
-            password=self.password.get_secret_value(),
-            database=self.database,
-            timeout=self.timeout,
-            enhanced_schema=True,
-        )
