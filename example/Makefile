@@ -4,7 +4,7 @@
 
 NEO4J_USERNAME ?= neo4j
 NEO4J_PASSWORD ?= supersecret
-OLLAMA_MODELS ?= llama3.2 llama3.1:8b gemma2:9b
+OLLAMA_MODELS ?= llama3.1:8b gemma2:9b
 TARGET ?= simple
 
 ################################################################################
