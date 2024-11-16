@@ -38,7 +38,7 @@ class OllamaSettings(BaseSettings):
     )
 
     url: Annotated[HttpUrl, Field(..., validation_alias="OLLAMA_URL")]
-    model: Annotated[str, Field("llama3.2", validation_alias="OLLAMA_MODEL")]
+    model: Annotated[str, Field(..., validation_alias="OLLAMA_MODEL")]
     temperature: Annotated[
         float,
         Field(default=0.0, validation_alias="OLLAMA_TEMPERATURE"),
