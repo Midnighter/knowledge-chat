@@ -20,6 +20,7 @@ services:
       - "NEO4J_DATABASE=movies"
       - "OLLAMA_URL=http://ollama:11434"
       - "OLLAMA_MODEL=llama3.1:8b"
+      - "AGENT_TOPIC=knowledge_chat.infrastructure.domain.service.langchain_kshot_response_agent:LangchainKShotResponseAgent"
     image: movies-chat:${TARGET:-simple}
     ports:
       - "8000:8000"

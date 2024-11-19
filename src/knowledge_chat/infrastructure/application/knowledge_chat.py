@@ -36,6 +36,7 @@ from knowledge_chat.application import (
 from knowledge_chat.domain.error import NotFoundError
 from knowledge_chat.domain.model import Conversation, Query, User
 from knowledge_chat.domain.service import DomainServiceRegistry
+from knowledge_chat.infrastructure.settings.agent_settings import AgentSettings
 
 
 logger = structlog.get_logger(__name__)
@@ -50,6 +51,7 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
         domain_service_registry: DomainServiceRegistry,
         knowledge_graph: Neo4jGraph,
         chat_model: BaseChatModel,
+        agent_settings: AgentSettings,
         env: EnvType | None = None,
         **kwargs,
     ) -> None:
@@ -57,6 +59,7 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
         self.domain_service_registry = domain_service_registry
         self.knowledge_graph = knowledge_graph
         self.chat_model = chat_model
+        self.agent_settings = agent_settings
 
     def create_user(self, user: UserDTO) -> UUID:
         """Create a new user instance and persist it."""
@@ -114,8 +117,7 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
 
         start = perf_counter()
         agent = self.domain_service_registry.get_response_agent(
-            "knowledge_chat.infrastructure.domain.service."
-            "langchain_kshot_response_agent:LangchainKShotResponseAgent",
+            self.agent_settings,
             self.knowledge_graph,
             self.chat_model,
         )

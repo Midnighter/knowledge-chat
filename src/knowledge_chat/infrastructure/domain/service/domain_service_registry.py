@@ -22,6 +22,7 @@ from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
 
 from knowledge_chat.domain.service import DomainServiceRegistry, ResponseAgent
+from knowledge_chat.infrastructure.settings.agent_settings import AgentSettings
 
 
 class LangchainDomainServiceRegistry(DomainServiceRegistry):
@@ -29,20 +30,19 @@ class LangchainDomainServiceRegistry(DomainServiceRegistry):
 
     def get_response_agent(
         self,
-        agent_topic: str,
+        agent_settings: AgentSettings,
         knowledge_graph: Neo4jGraph,
         chat_model: BaseChatModel,
-        custom_prompt: str | None = None,
         **kwargs,
     ) -> ResponseAgent:
         """Return a fully configured response agent."""
-        agent_cls: type[ResponseAgent] = resolve_topic(agent_topic)
+        agent_cls: type[ResponseAgent] = resolve_topic(agent_settings.topic)
 
         prompt: PromptTemplate | None = None
-        if custom_prompt is not None:
+        if agent_settings.prompt is not None:
             prompt = PromptTemplate(
                 input_variables=["schema", "query"],
-                template=custom_prompt,
+                template=agent_settings.prompt,
             )
 
         return agent_cls(

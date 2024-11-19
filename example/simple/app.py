@@ -26,17 +26,20 @@ from structlog.contextvars import bind_contextvars, clear_contextvars
 from knowledge_chat.application import UserDTO
 from knowledge_chat.infrastructure.application import KnowledgeChat
 from knowledge_chat.infrastructure.domain.service import LangchainDomainServiceRegistry
+from knowledge_chat.infrastructure.settings.agent_settings import AgentSettings
 from knowledge_chat.infrastructure.settings.neo4j_settings import Neo4jSettings
 from knowledge_chat.infrastructure.settings.ollama_settings import OllamaSettings
 
 
 logger = structlog.get_logger()
+agent_settings = AgentSettings.create()
 neo4j_settings = Neo4jSettings.create()
 ollama_settings = OllamaSettings.create()
 chat_app = KnowledgeChat(
     domain_service_registry=LangchainDomainServiceRegistry(),
     knowledge_graph=neo4j_settings.create_graph(),
     chat_model=ollama_settings.create_model(),
+    agent_settings=agent_settings,
 )
 
 

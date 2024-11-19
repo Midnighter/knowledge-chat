@@ -29,7 +29,7 @@ class DomainServiceRegistry(ABC):
     @abstractmethod
     def get_response_agent(
         self,
-        agent_topic: str,
+        agent_settings,  # noqa: ANN001
         knowledge_graph: Neo4jGraph,
         chat_model: BaseChatModel,
         custom_prompt: str | None = None,
