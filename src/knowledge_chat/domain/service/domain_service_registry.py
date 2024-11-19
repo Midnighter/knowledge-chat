@@ -16,6 +16,7 @@
 """Provide an abstract interface for the domain service registry."""
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -29,7 +30,7 @@ class DomainServiceRegistry(ABC):
     @abstractmethod
     def get_response_agent(
         self,
-        agent_settings,  # noqa: ANN001
+        agent_settings: Any,  # noqa: ANN401
         knowledge_graph: Neo4jGraph,
         chat_model: BaseChatModel,
         custom_prompt: str | None = None,

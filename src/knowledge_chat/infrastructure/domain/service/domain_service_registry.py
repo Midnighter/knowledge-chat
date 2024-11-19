@@ -28,7 +28,7 @@ from knowledge_chat.infrastructure.settings.agent_settings import AgentSettings
 class LangchainDomainServiceRegistry(DomainServiceRegistry):
     """Define the abstract interface for the domain service registry."""
 
-    def get_response_agent(
+    def get_response_agent(  # type: ignore[override]
         self,
         agent_settings: AgentSettings,
         knowledge_graph: Neo4jGraph,

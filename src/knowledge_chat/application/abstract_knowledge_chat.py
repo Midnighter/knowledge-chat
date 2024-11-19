@@ -30,11 +30,11 @@ class AbstractKnowledgeChat(ABC):
         """Create a new user instance and persist it."""
 
     @abstractmethod
-    def get_user(self, user_id: UUID) -> UserDTO:
+    def get_user(self, user_id: str) -> UserDTO:
         """Get user data by their identifier."""
 
     @abstractmethod
-    def start_conversation(self, user_id: UUID) -> UUID:
+    def start_conversation(self, user_id: str) -> UUID:
         """Add a new conversation to the user."""
 
     @abstractmethod
