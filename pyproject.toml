@@ -262,7 +262,6 @@ serve = "mkdocs serve {args}"
 [tool.hatch.envs.install]
 description = """Test the installation the package."""
 dependencies = [
-    "pip",
     "twine",
 ]
 detached = true
