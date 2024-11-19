@@ -25,6 +25,7 @@ from knowledge_chat.domain.model import User
 class UserDTO(NamedTuple):
     """Define the user data transfer object (DTO)."""
 
+    user_id: str
     name: str
     email: str
 
@@ -32,10 +33,11 @@ class UserDTO(NamedTuple):
     def from_user(cls, user: User) -> UserDTO:
         """Transform a user domain model into a DTO."""
         return cls(
+            user_id=user.user_id,
             name=user.name,
             email=user.email,
         )
 
     def create(self) -> User:
         """Create a new user instance."""
-        return User(name=self.name, email=self.email)
+        return User.create(user_id=self.user_id, name=self.name, email=self.email)
