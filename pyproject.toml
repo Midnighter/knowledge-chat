@@ -189,11 +189,6 @@ layers = [
 # Hatch Environments
 ################################################################################
 
-[tool.hatch.env]
-requires = [
-    "hatch-pip-compile"
-]
-
 [tool.hatch.envs.dev]
 description = """
 Development environment.
