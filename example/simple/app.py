@@ -24,6 +24,7 @@ import structlog
 from structlog.contextvars import bind_contextvars, clear_contextvars
 
 from knowledge_chat.application import UserDTO
+from knowledge_chat.domain.error import NotFoundError
 from knowledge_chat.infrastructure.application import KnowledgeChat
 from knowledge_chat.infrastructure.domain.service import LangchainDomainServiceRegistry
 from knowledge_chat.infrastructure.settings.agent_settings import AgentSettings
@@ -46,19 +47,21 @@ chat_app = KnowledgeChat(
 @cl.on_chat_start
 def init() -> None:
     """Initialize the user and chat."""
-    start = perf_counter()
-    clear_contextvars()
-    bind_contextvars(user_session_id=cl.user_session.get("id"))
     logger.debug("CHAINLIT_ON_CHAT_STARTED")
 
+    start = perf_counter()
+    # We use the session ID as the user identifier.
+    user_id = cl.user_session.get("id")
+    clear_contextvars()
+    bind_contextvars(user_id=user_id)
+
     try:
-        user_id = UUID(cl.user_session.get("user-id", None))
-        bind_contextvars(user_id=user_id)
+        chat_app.get_user(user_id)
         logger.debug("EXISTING_USER_RESTORED")
-    except TypeError:
-        user_id = chat_app.create_user(UserDTO(name="anon", email="anon@me"))
-        bind_contextvars(user_id=user_id)
-        cl.user_session.set("user-id", str(user_id))
+    except NotFoundError:
+        chat_app.create_user(
+            UserDTO(user_id=user_id, name="anon", email="anon@me"),
+        )
         logger.debug("NEW_USER_CREATED")
 
     try:
@@ -71,18 +74,21 @@ def init() -> None:
         cl.user_session.set("conversation-id", str(conversation_id))
         logger.debug("NEW_CONVERSATION_STARTED")
 
-    duration = timedelta(seconds=perf_counter() - start)
-    logger.debug("CHAINLIT_ON_CHAT_ENDED", duration=duration)
+    logger.debug(
+        "CHAINLIT_ON_CHAT_ENDED",
+        duration=timedelta(seconds=perf_counter() - start),
+    )
 
 
 @cl.on_message
 async def chat(message: cl.Message) -> None:
     """Chat with the user-specific agent."""
     start = perf_counter()
-    clear_contextvars()
-    bind_contextvars(user_session_id=cl.user_session.get("id"))
 
-    user_id = UUID(cl.user_session.get("user-id"))
+    # We use the session ID as the user identifier.
+    user_id = cl.user_session.get("id")
+
+    clear_contextvars()
     bind_contextvars(user_id=user_id)
 
     conversation_id = UUID(cl.user_session.get("conversation-id"))
@@ -101,5 +107,7 @@ async def chat(message: cl.Message) -> None:
         ).send()
         raise
     await cl.Message(content=exchange.response).send()
-    duration = timedelta(seconds=perf_counter() - start)
-    await logger.adebug("MESSAGE_REPLIED", duration=duration)
+    await logger.adebug(
+        "MESSAGE_REPLIED",
+        duration=timedelta(seconds=perf_counter() - start),
+    )
