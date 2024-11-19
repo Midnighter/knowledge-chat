@@ -5,6 +5,7 @@ on:
     branches:
     - main
     - dev
+    - exclude-mac-install
   pull_request:
     branches:
     - main
