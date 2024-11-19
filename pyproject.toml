@@ -11,7 +11,7 @@ requires = ["hatchling", "hatch-vcs"]
 ################################################################################
 
 [project]
-name = "knowledge_chat"
+name = "knowledge-chat"
 dynamic = ["version"]
 description = "A framework to enable retrieval augmented generation (RAG) with knowledge graphs for chat applications."
 authors = [
