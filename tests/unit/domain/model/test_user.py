@@ -25,12 +25,20 @@ from knowledge_chat.domain.model import User
 @pytest.fixture
 def user() -> User:
     """Return a user aggregate instance."""
-    return User(name="Richard Daniel Sanchez", email="rick@multiverse.brain")
+    return User.create(
+        user_id="numero uno",
+        name="Richard Daniel Sanchez",
+        email="rick@multiverse.brain",
+    )
 
 
 def test_create():
     """Test that a user is correctly created."""
-    user = User(name="Richard Daniel Sanchez", email="rick@multiverse.brain")
+    user = User.create(
+        user_id="numero uno",
+        name="Richard Daniel Sanchez",
+        email="rick@multiverse.brain",
+    )
     assert isinstance(user.id, UUID)
     assert user.name == "Richard Daniel Sanchez"
     assert user.email == "rick@multiverse.brain"
