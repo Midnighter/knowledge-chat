@@ -28,6 +28,7 @@ def application() -> KnowledgeChat:
         domain_service_registry=None,
         knowledge_graph=None,
         chat_model=None,
+        agent_settings=None,
     )
 
 
@@ -35,6 +36,7 @@ def application() -> KnowledgeChat:
     "user",
     [
         UserDTO(
+            user_id="numero uno",
             name="Richard Daniel Sanchez",
             email="rick@multiverse.brain",
         ),
@@ -42,8 +44,8 @@ def application() -> KnowledgeChat:
 )
 def test_create_get_user(user: UserDTO, application: KnowledgeChat):
     """Test that a user can be created and retrieved."""
-    user_id = application.create_user(user=user)
-    result = application.get_user(user_id=user_id)
+    application.create_user(user=user)
+    result = application.get_user(user.user_id)
     assert result == user
 
 
@@ -51,6 +53,7 @@ def test_create_get_user(user: UserDTO, application: KnowledgeChat):
     "user",
     [
         UserDTO(
+            user_id="numero uno",
             name="Richard Daniel Sanchez",
             email="rick@multiverse.brain",
         ),
@@ -58,8 +61,8 @@ def test_create_get_user(user: UserDTO, application: KnowledgeChat):
 )
 def test_start_get_conversation(user: UserDTO, application: KnowledgeChat):
     """Test that a user can be created and retrieved."""
-    user_id = application.create_user(user=user)
-    conversation_id = application.start_conversation(user_id=user_id)
+    application.create_user(user=user)
+    conversation_id = application.start_conversation(user.user_id)
     notifications = application.notification_log.select(start=0, limit=10)
     assert len(notifications) == 3
 

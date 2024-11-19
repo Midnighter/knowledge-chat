@@ -63,25 +63,30 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
 
     def create_user(self, user: UserDTO) -> UUID:
         """Create a new user instance and persist it."""
-        domain_user = user.create()
-        self.save(domain_user)
+        try:
+            domain_user = self._get_user(user_id=user.user_id)
+            logger.error("User already exists.", user=user)
+        except NotFoundError:
+            domain_user = user.create()
+            self.save(domain_user)
         return domain_user.id
 
-    def _get_user(self, user_id: UUID) -> User:
+    def _get_user(self, user_id: str) -> User:
         """Get a user's state by their identifier."""
+        uuid = User.create_id(user_id=user_id)
         try:
-            result: User = self.repository.get(user_id)
+            result: User = self.repository.get(uuid)
         except AggregateNotFoundError as error:
-            raise NotFoundError(uuid=user_id) from error
+            raise NotFoundError(uuid=uuid) from error
 
         return result
 
-    def get_user(self, user_id: UUID) -> UserDTO:
+    def get_user(self, user_id: str) -> UserDTO:
         """Get user data by their identifier."""
-        user = self._get_user(user_id)
+        user = self._get_user(user_id=user_id)
         return UserDTO.from_user(user=user)
 
-    def start_conversation(self, user_id: UUID) -> UUID:
+    def start_conversation(self, user_id: str) -> UUID:
         """Add a new conversation to the user."""
         user = self._get_user(user_id)
         conversation = Conversation(user_reference=user.id)
