@@ -21,7 +21,7 @@ import warnings
 from typing import Annotated
 
 from langchain_openai import AzureChatOpenAI
-from pydantic import Field, SecretStr  # noqa: TCH002
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

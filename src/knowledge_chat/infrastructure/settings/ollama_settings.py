@@ -21,7 +21,7 @@ import warnings
 from typing import Annotated
 
 from langchain_ollama import ChatOllama
-from pydantic import Field, HttpUrl  # noqa: TCH002
+from pydantic import Field, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
