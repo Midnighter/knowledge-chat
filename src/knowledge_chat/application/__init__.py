@@ -15,5 +15,11 @@
 
 """Provide the application code layer."""
 
-from .dto import UserDTO, ConversationDTO, ExchangeOutputDTO
+from .dto import (
+    UserDTO,
+    ConversationDTO,
+    ExchangeOutputDTO,
+    Neo4jSettings,
+    ChatModelSettings,
+)
 from .abstract_knowledge_chat import AbstractKnowledgeChat

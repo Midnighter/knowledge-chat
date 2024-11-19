@@ -17,25 +17,16 @@
 
 from __future__ import annotations
 
-import warnings
 from typing import Annotated
 
 from langchain_openai import AzureChatOpenAI
 from pydantic import Field, SecretStr  # noqa: TCH002
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from knowledge_chat.application import ChatModelSettings
 
 
-class AzureOpenAISettings(BaseSettings):
+class AzureOpenAISettings(ChatModelSettings):
     """Define the Azure OpenAI connection settings."""
-
-    model_config = SettingsConfigDict(
-        case_sensitive=True,
-        populate_by_name=True,
-        extra="ignore",
-        env_file=".env",
-        secrets_dir="/run/secrets",
-        protected_namespaces=("settings_",),
-    )
 
     service: Annotated[str, Field(..., validation_alias="AZURE_OPENAI_SERVICE")]
     api_key: Annotated[SecretStr, Field(..., validation_alias="AZURE_OPENAI_API_KEY")]
@@ -54,7 +45,7 @@ class AzureOpenAISettings(BaseSettings):
         str,
         Field(default="chat", validation_alias="AZURE_OPENAI_DEPLOYMENT_NAME"),
     ]
-    model_name: Annotated[
+    model: Annotated[
         str,
         Field(default="gpt-4", validation_alias="AZURE_OPENAI_MODEL_NAME"),
     ]
@@ -63,17 +54,6 @@ class AzureOpenAISettings(BaseSettings):
         Field(default=0.0, validation_alias="AZURE_OPENAI_TEMPERATURE"),
     ]
 
-    @classmethod
-    def create(cls, **kwargs) -> AzureOpenAISettings:
-        """Create a settings instance from environment variables or secrets."""
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore",
-                message='directory "/run/secrets" does not exist',
-                category=UserWarning,
-            )
-            return cls(**kwargs)
-
     def create_model(self) -> AzureChatOpenAI:
         """Return a langchain Azure OpenAI chat model instance."""
         return AzureChatOpenAI(
@@ -81,6 +61,6 @@ class AzureOpenAISettings(BaseSettings):
             openai_api_key=self.api_key.get_secret_value(),  # type: ignore[arg-type]
             openai_api_version=self.api_version,
             azure_deployment=self.deployment_name,  # type: ignore[call-arg]
-            model_name=self.model_name,
+            model_name=self.model,
             temperature=self.temperature,
         )

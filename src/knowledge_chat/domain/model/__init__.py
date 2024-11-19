@@ -18,6 +18,7 @@
 from .query import Query
 from .thought import Thought
 from .response import Response
+from .knowledge_graph_configuration import KnowledgeGraphConfiguration
 from .exchange import Exchange
 from .conversation import Conversation
 from .user import User

@@ -31,10 +31,15 @@ from knowledge_chat.application import (
     AbstractKnowledgeChat,
     ConversationDTO,
     ExchangeOutputDTO,
+    Neo4jSettings,
     UserDTO,
 )
 from knowledge_chat.domain.error import NotFoundError
-from knowledge_chat.domain.model import Conversation, Query, User
+from knowledge_chat.domain.model import (
+    Conversation,
+    Query,
+    User,
+)
 from knowledge_chat.domain.service import DomainServiceRegistry
 
 
@@ -78,10 +83,21 @@ class KnowledgeChat(Application, AbstractKnowledgeChat):
         user = self._get_user(user_id)
         return UserDTO.from_user(user=user)
 
-    def start_conversation(self, user_id: UUID) -> UUID:
+    def start_conversation(
+        self,
+        user_id: UUID,
+        knowledge_graph: Neo4jSettings,
+        chat_model: ,
+        agent: ,
+    ) -> UUID:
         """Add a new conversation to the user."""
         user = self._get_user(user_id)
         conversation = Conversation(user_reference=user.id)
+        conversation.configure_knowledge_graph(
+            knowledge_graph.to_knowledge_graph_configuration()
+        )
+        conversation.configure_chat_model(chat_model.to_chat_model())
+        conversation.configure_agent(agent.to_agent())
         user.add_conversation(conversation_reference=conversation.id)
         self.save(user, conversation)
         return conversation.id

@@ -21,7 +21,7 @@ from langchain_community.chains.graph_qa.cypher import GraphCypherQAChain
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from knowledge_chat.application.dto import Neo4jSettings
+from knowledge_chat.domain.model import KnowledgeGraphConfiguration
 from knowledge_chat.domain.service import DomainServiceRegistry, ResponseAgent
 
 
@@ -30,15 +30,15 @@ class LangchainDomainServiceRegistry(DomainServiceRegistry):
 
     def create_knowledge_graph(
         self,
-        knowledge_graph_settings: Neo4jSettings,
+        knowledge_graph_configuration: KnowledgeGraphConfiguration,
     ) -> Neo4jGraph:
         """Return a knowledge graph service instance with a langchain interface."""
         return Neo4jGraph(
-            url=str(knowledge_graph_settings.connection_uri),
-            username=knowledge_graph_settings.username,
-            password=knowledge_graph_settings.password.get_secret_value(),
-            database=knowledge_graph_settings.database,
-            timeout=knowledge_graph_settings.timeout,
+            url=knowledge_graph_configuration.connection_uri,
+            username=knowledge_graph_configuration.username,
+            password=knowledge_graph_configuration.password,
+            database=knowledge_graph_configuration.database,
+            timeout=knowledge_graph_configuration.timeout,
             enhanced_schema=True,
         )
 

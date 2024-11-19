@@ -21,6 +21,8 @@ from typing import Annotated
 
 from pydantic import AnyUrl, Field, SecretStr, StringConstraints
 
+from knowledge_chat.domain.model import KnowledgeGraphConfiguration
+
 from ._base_settings import BaseSettings
 
 
@@ -55,3 +57,13 @@ class Neo4jSettings(BaseSettings):
         ),
     ]
     timeout: Annotated[float, Field(default=30.0, validation_alias="NEO4J_TIMEOUT")]
+
+    def to_knowledge_graph_configuration(self) -> KnowledgeGraphConfiguration:
+        """Create a knowledge graph configuration value object."""
+        return KnowledgeGraphConfiguration(
+            connection_uri=str(self.connection_uri),
+            username=self.username,
+            password=self.password.get_secret_value(),
+            database=self.database,
+            timeout=self.timeout,
+        )
