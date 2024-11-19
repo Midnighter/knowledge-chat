@@ -17,25 +17,16 @@
 
 from __future__ import annotations
 
-import warnings
 from typing import Annotated
 
 from langchain_ollama import ChatOllama
 from pydantic import Field, HttpUrl
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from ._base_settings import BaseSettings
 
 
 class OllamaSettings(BaseSettings):
     """Define the Ollama connection settings."""
-
-    model_config = SettingsConfigDict(
-        case_sensitive=True,
-        populate_by_name=True,
-        extra="ignore",
-        env_file=".env",
-        secrets_dir="/run/secrets",
-        protected_namespaces=("settings_",),
-    )
 
     url: Annotated[HttpUrl, Field(..., validation_alias="OLLAMA_URL")]
     model: Annotated[str, Field(..., validation_alias="OLLAMA_MODEL")]
@@ -43,17 +34,6 @@ class OllamaSettings(BaseSettings):
         float,
         Field(default=0.0, validation_alias="OLLAMA_TEMPERATURE"),
     ]
-
-    @classmethod
-    def create(cls, **kwargs) -> OllamaSettings:
-        """Create a settings instance from environment variables or secrets."""
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore",
-                message='directory "/run/secrets" does not exist',
-                category=UserWarning,
-            )
-            return cls(**kwargs)
 
     def create_model(self) -> ChatOllama:
         """Return an Ollama chat model instance."""

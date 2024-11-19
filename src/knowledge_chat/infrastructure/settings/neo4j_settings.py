@@ -17,12 +17,12 @@
 
 from __future__ import annotations
 
-import warnings
 from typing import Annotated
 
 from langchain_community.graphs import Neo4jGraph
 from pydantic import AnyUrl, Field, SecretStr, StringConstraints
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from ._base_settings import BaseSettings
 
 
 Neo4jDatabaseName = Annotated[
@@ -38,14 +38,6 @@ Neo4jDatabaseName = Annotated[
 
 class Neo4jSettings(BaseSettings):
     """Define the Neo4j connection settings."""
-
-    model_config = SettingsConfigDict(
-        case_sensitive=True,
-        populate_by_name=True,
-        extra="ignore",
-        env_file=".env",
-        secrets_dir="/run/secrets",
-    )
 
     connection_uri: Annotated[
         AnyUrl,
@@ -64,17 +56,6 @@ class Neo4jSettings(BaseSettings):
         ),
     ]
     timeout: Annotated[float, Field(default=30.0, validation_alias="NEO4J_TIMEOUT")]
-
-    @classmethod
-    def create(cls, **kwargs) -> Neo4jSettings:
-        """Create a settings instance from environment variables or secrets."""
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore",
-                message='directory "/run/secrets" does not exist',
-                category=UserWarning,
-            )
-            return cls(**kwargs)
 
     def create_graph(self) -> Neo4jGraph:
         """Return a Neo4j graph instance with a langchain interface."""

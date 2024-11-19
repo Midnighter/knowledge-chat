@@ -17,25 +17,16 @@
 
 from __future__ import annotations
 
-import warnings
 from typing import Annotated
 
 from langchain_openai import AzureChatOpenAI
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from ._base_settings import BaseSettings
 
 
 class AzureOpenAISettings(BaseSettings):
     """Define the Azure OpenAI connection settings."""
-
-    model_config = SettingsConfigDict(
-        case_sensitive=True,
-        populate_by_name=True,
-        extra="ignore",
-        env_file=".env",
-        secrets_dir="/run/secrets",
-        protected_namespaces=("settings_",),
-    )
 
     service: Annotated[str, Field(..., validation_alias="AZURE_OPENAI_SERVICE")]
     api_key: Annotated[SecretStr, Field(..., validation_alias="AZURE_OPENAI_API_KEY")]
@@ -62,17 +53,6 @@ class AzureOpenAISettings(BaseSettings):
         float,
         Field(default=0.0, validation_alias="AZURE_OPENAI_TEMPERATURE"),
     ]
-
-    @classmethod
-    def create(cls, **kwargs) -> AzureOpenAISettings:
-        """Create a settings instance from environment variables or secrets."""
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore",
-                message='directory "/run/secrets" does not exist',
-                category=UserWarning,
-            )
-            return cls(**kwargs)
 
     def create_model(self) -> AzureChatOpenAI:
         """Return a langchain Azure OpenAI chat model instance."""
