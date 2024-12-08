@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from knowledge_chat.domain.model import Conversation  # noqa: TCH001
+from knowledge_chat.domain.model import Conversation  # noqa: TC001
 
 
 class ConversationDTO(NamedTuple):
